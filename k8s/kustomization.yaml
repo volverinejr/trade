@@ -6,4 +6,4 @@ resources:
 images:
 - name: trade
   newName: volverinejr/trade
-  newTag: 0.0.1
+  newTag: 0.0.2
