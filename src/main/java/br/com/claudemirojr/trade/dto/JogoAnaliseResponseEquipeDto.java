@@ -17,7 +17,11 @@ public class JogoAnaliseResponseEquipeDto implements Serializable {
 	private Double marcouMediaEscanteioHT;
 
 	private Double marcouMediaEscanteioFT;
+	
+	private Double sofreuMediaEscanteioHT;
 
+	private Double sofreuMediaEscanteioFT;
+	
 	private Double mediaEscanteioJogo;
 
 	private Double resultEscanteioHT;

@@ -5,6 +5,10 @@ public interface IJogoResultAnalise {
 
 	Double getMarcouMediaEscanteioFT();
 
+	Double getSofreuMediaEscanteioHT();
+
+	Double getSofreuMediaEscanteioFT();
+
 	Double getMediaEscanteioJogo();
 
 	Double getResultEscanteioHT();
