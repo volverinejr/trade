@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseDto;
+import br.com.claudemirojr.trade.dto.JogoDadosResponseDto;
 import br.com.claudemirojr.trade.dto.JogoDto;
 import br.com.claudemirojr.trade.dto.JogoResponseDto;
 import br.com.claudemirojr.trade.model.ParamsRequestModel;
@@ -88,11 +89,18 @@ public class JogoController {
 	}
 	
 	
-	@Operation(summary = "Análise do mandante X Visitante em um determinado campeonato")
+	@Operation(summary = "Análise do mandante X visitante em um determinado campeonato")
 	@GetMapping("/analise/campeonato/{idCampeonato}/mandante/{idMandante}/visitante/{idVisitante}")
-	public JogoAnaliseResponseDto findByAnaliseMandante( @PathVariable Long idCampeonato, @PathVariable Long idMandante, @PathVariable Long idVisitante) {
+	public JogoAnaliseResponseDto findByAnaliseMandanteXVisitante( @PathVariable Long idCampeonato, @PathVariable Long idMandante, @PathVariable Long idVisitante) {
 		return jogoService.findByAnaliseMandanteXVisitante(idCampeonato, idMandante, idVisitante);
-		
 	}
+	
+	
+	@Operation(summary = "Jogos do mandante X visitante em um determinado campeonato")
+	@GetMapping("/dados/campeonato/{idCampeonato}/mandante/{idMandante}/visitante/{idVisitante}")
+	public JogoDadosResponseDto findByJogoMandanteXVisitante( @PathVariable Long idCampeonato, @PathVariable Long idMandante, @PathVariable Long idVisitante) {
+		return jogoService.findByJogoMandanteXVisitante(idCampeonato, idMandante, idVisitante);
+	}
+	
 
 }

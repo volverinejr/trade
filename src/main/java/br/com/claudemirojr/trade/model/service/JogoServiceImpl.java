@@ -11,9 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import br.com.claudemirojr.trade.converter.ModelMaperConverter;
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseDto;
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseEquipeDto;
+import br.com.claudemirojr.trade.dto.JogoDadosResponseDto;
 import br.com.claudemirojr.trade.dto.JogoDto;
 import br.com.claudemirojr.trade.dto.JogoResponseDto;
 import br.com.claudemirojr.trade.exception.ResourceNotFoundException;
+import br.com.claudemirojr.trade.exception.ResourceServiceValidationException;
 import br.com.claudemirojr.trade.model.ParamsRequestModel;
 import br.com.claudemirojr.trade.model.entity.Jogo;
 import br.com.claudemirojr.trade.model.repository.CampeonatoRepository;
@@ -37,13 +39,32 @@ public class JogoServiceImpl implements JogoService {
 	public String MSG_EQUIPE_NAO_EXISTE = "Equipe não encontrada para id %d";
 
 	private JogoResponseDto convertToJogoResponseDto(Jogo entity) {
-		return ModelMaperConverter.parseObject(entity, JogoResponseDto.class); 
+		return ModelMaperConverter.parseObject(entity, JogoResponseDto.class);
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	@CacheEvict(value = "trade_jogoCache", allEntries = true)
 	public JogoResponseDto criar(JogoDto jogoCriarDto) {
+
+		var idCampeonado = jogoCriarDto.getCampeonato().getId();
+		var idMandante = jogoCriarDto.getEqpMandante().getId();
+		var idVisitante = jogoCriarDto.getEqpVisitante().getId();
+
+		campeonatoRepository.findById(idCampeonado).orElseThrow(
+				() -> new ResourceNotFoundException(String.format(MSG_CAMPEONATO_NAO_EXISTE, idCampeonado)));
+
+		var equipeMandante = eqiupeRepository.findById(idMandante)
+				.orElseThrow(() -> new ResourceNotFoundException(String.format(MSG_EQUIPE_NAO_EXISTE, idMandante)));
+
+		var equipeVisitante = eqiupeRepository.findById(idVisitante)
+				.orElseThrow(() -> new ResourceNotFoundException(String.format(MSG_EQUIPE_NAO_EXISTE, idVisitante)));
+
+		if (equipeMandante.equals(equipeVisitante)) {
+			throw new ResourceServiceValidationException(
+					String.format("Equipe visitante;tem que ser diferente da equipe mandante"));
+		}
+
 		var entity = new Jogo(jogoCriarDto.getCampeonato(), jogoCriarDto.getNumeroRodada(),
 
 				jogoCriarDto.getEqpMandante(), jogoCriarDto.getEqpMandantePrimeitoTempoTotalGol(),
@@ -67,6 +88,24 @@ public class JogoServiceImpl implements JogoService {
 	public JogoResponseDto atualizar(Long id, JogoDto jogoAtualizarDto) {
 		var entity = jogoRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException(String.format(MSG_ENTIDADE_NAO_EXISTE, id)));
+
+		var idCampeonado = jogoAtualizarDto.getCampeonato().getId();
+		var idMandante = jogoAtualizarDto.getEqpMandante().getId();
+		var idVisitante = jogoAtualizarDto.getEqpVisitante().getId();
+
+		campeonatoRepository.findById(idCampeonado).orElseThrow(
+				() -> new ResourceNotFoundException(String.format(MSG_CAMPEONATO_NAO_EXISTE, idCampeonado)));
+
+		var equipeMandante = eqiupeRepository.findById(idMandante)
+				.orElseThrow(() -> new ResourceNotFoundException(String.format(MSG_EQUIPE_NAO_EXISTE, idMandante)));
+
+		var equipeVisitante = eqiupeRepository.findById(idVisitante)
+				.orElseThrow(() -> new ResourceNotFoundException(String.format(MSG_EQUIPE_NAO_EXISTE, idVisitante)));
+
+		if (equipeMandante.equals(equipeVisitante)) {
+			throw new ResourceServiceValidationException(
+					String.format("Equipe mandante tem que ser diferente da equipe visitante"));
+		}
 
 		entity.Atualizar(jogoAtualizarDto.getCampeonato(), jogoAtualizarDto.getNumeroRodada(),
 
@@ -119,17 +158,17 @@ public class JogoServiceImpl implements JogoService {
 
 	@Override
 	@Transactional(readOnly = true)
-	//@Cacheable(value = "trade_jogoCache")
+	@Cacheable(value = "trade_jogoCache")
 	public JogoResponseDto findById(Long id) {
 		var entity = jogoRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException(String.format(MSG_ENTIDADE_NAO_EXISTE, id)));
-		
+
 		return convertToJogoResponseDto(entity);
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	@Cacheable(value = "trade_jogoAnaliseMandanteVisitanteCache")
+	//@Cacheable(value = "trade_jogoAnaliseMandanteVisitanteCache")
 	public JogoAnaliseResponseDto findByAnaliseMandanteXVisitante(Long idCampeonado, Long idMandante,
 			Long idVisitante) {
 		var campeonato = campeonatoRepository.findById(idCampeonado).orElseThrow(
@@ -153,6 +192,8 @@ public class JogoServiceImpl implements JogoService {
 		if (analisado.isPresent()) {
 			mandante.setMarcouMediaEscanteioHT(analisado.get().getMarcouMediaEscanteioHT());
 			mandante.setMarcouMediaEscanteioFT(analisado.get().getMarcouMediaEscanteioFT());
+			mandante.setSofreuMediaEscanteioHT(analisado.get().getSofreuMediaEscanteioHT());
+			mandante.setSofreuMediaEscanteioFT(analisado.get().getSofreuMediaEscanteioFT());
 			mandante.setMediaEscanteioJogo(analisado.get().getMediaEscanteioJogo());
 			mandante.setResultEscanteioHT(analisado.get().getResultEscanteioHT());
 			mandante.setResultEscanteioFT(analisado.get().getResultEscanteioFT());
@@ -166,6 +207,8 @@ public class JogoServiceImpl implements JogoService {
 		if (analisado.isPresent()) {
 			visitante.setMarcouMediaEscanteioHT(analisado.get().getMarcouMediaEscanteioHT());
 			visitante.setMarcouMediaEscanteioFT(analisado.get().getMarcouMediaEscanteioFT());
+			visitante.setSofreuMediaEscanteioHT(analisado.get().getSofreuMediaEscanteioHT());
+			visitante.setSofreuMediaEscanteioFT(analisado.get().getSofreuMediaEscanteioFT());
 			visitante.setMediaEscanteioJogo(analisado.get().getMediaEscanteioJogo());
 			visitante.setResultEscanteioHT(analisado.get().getResultEscanteioHT());
 			visitante.setResultEscanteioFT(analisado.get().getResultEscanteioFT());
@@ -174,8 +217,42 @@ public class JogoServiceImpl implements JogoService {
 
 			jogoAnaliseResponseDto.setAnaliseVisitante(visitante);
 		}
+		
+		
+		var jogosMandante = jogoRepository.findJogosMandante(idCampeonado, idMandante);
+		jogoAnaliseResponseDto.setJogosMandante(jogosMandante);
+		
+		var jogosVisitante = jogoRepository.findJogosVisitante(idCampeonado, idVisitante);
+		jogoAnaliseResponseDto.setJogosVisitante(jogosVisitante);
+		
 
 		return jogoAnaliseResponseDto;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public JogoDadosResponseDto findByJogoMandanteXVisitante(Long idCampeonado, Long idMandante, Long idVisitante) {
+		var campeonato = campeonatoRepository.findById(idCampeonado).orElseThrow(
+				() -> new ResourceNotFoundException(String.format(MSG_CAMPEONATO_NAO_EXISTE, idCampeonado)));
+
+		var equipeMandante = eqiupeRepository.findById(idMandante)
+				.orElseThrow(() -> new ResourceNotFoundException(String.format(MSG_EQUIPE_NAO_EXISTE, idMandante)));
+
+		var equipeVisitante = eqiupeRepository.findById(idVisitante)
+				.orElseThrow(() -> new ResourceNotFoundException(String.format(MSG_EQUIPE_NAO_EXISTE, idVisitante)));
+
+		JogoDadosResponseDto jogoDadosResponseDto = new JogoDadosResponseDto();
+		jogoDadosResponseDto.setCampeonato(campeonato);
+
+		jogoDadosResponseDto.setEquipeMandante(equipeMandante);
+		var jogosMandante = jogoRepository.findJogosMandante(idCampeonado, idMandante);
+		jogoDadosResponseDto.setJogoMandante(jogosMandante);
+
+		jogoDadosResponseDto.setEquipeVisitante(equipeVisitante);
+		var jogosVisitante = jogoRepository.findJogosVisitante(idCampeonado, idVisitante);
+		jogoDadosResponseDto.setJogoVisitante(jogosVisitante);
+
+		return jogoDadosResponseDto;
 	}
 
 }

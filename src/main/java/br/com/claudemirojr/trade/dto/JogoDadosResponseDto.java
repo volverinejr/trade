@@ -15,23 +15,17 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class JogoAnaliseResponseDto implements Serializable {
+public class JogoDadosResponseDto implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Campeonato campeonato;
 
-	//MANDANTE
 	private Equipe equipeMandante;
-	
-	private JogoAnaliseResponseEquipeDto analiseMandante;
 
-	private List<IJogoDados> jogosMandante;
+	private List<IJogoDados> jogoMandante;
 
-	//VISITANTE
 	private Equipe equipeVisitante;
 
-	private JogoAnaliseResponseEquipeDto analiseVisitante;
-
-	private List<IJogoDados> jogosVisitante;
+	private List<IJogoDados> jogoVisitante;
 
 }

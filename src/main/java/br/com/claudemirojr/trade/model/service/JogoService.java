@@ -3,6 +3,7 @@ package br.com.claudemirojr.trade.model.service;
 import org.springframework.data.domain.Page;
 
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseDto;
+import br.com.claudemirojr.trade.dto.JogoDadosResponseDto;
 import br.com.claudemirojr.trade.dto.JogoDto;
 import br.com.claudemirojr.trade.dto.JogoResponseDto;
 import br.com.claudemirojr.trade.model.ParamsRequestModel;
@@ -22,5 +23,7 @@ public interface JogoService {
 	public JogoResponseDto findById(Long id);
 
 	public JogoAnaliseResponseDto findByAnaliseMandanteXVisitante(Long idCampeonado, Long idMandante, Long idVisitante);
-	
+
+	public JogoDadosResponseDto findByJogoMandanteXVisitante(Long idCampeonado, Long idMandante, Long idVisitante);
+
 }
