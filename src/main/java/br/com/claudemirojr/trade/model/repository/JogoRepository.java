@@ -116,7 +116,8 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 	
 	@Query(value="""
 			SELECT 	a.numero_rodada as numeroRodada,
-			
+					visitante.nome as equipe,
+
 					( a.eqp_mandante_primeito_tempo_total_gol + a.eqp_visitante_primeito_tempo_total_gol ) as totalGolHT,
 					( a.eqp_mandante_total_gol + a.eqp_visitante_total_gol ) as totalGolFT,
 			
@@ -124,6 +125,7 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 					( a.eqp_mandante_total_escanteio + a.eqp_visitante_total_escanteio ) as totalEscanteioFT
 			
 			FROM jogo as a
+					join equipe as visitante on ( a.eqp_visitante_id = visitante.id ) 
 			where a.campeonato_id = ?1
 					and a.eqp_mandante_id = ?2
 			order by a.numero_rodada desc 
@@ -134,7 +136,8 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 	
 	@Query(value="""
 			SELECT 	a.numero_rodada as numeroRodada,
-			
+					mandante.nome as equipe,
+
 					( a.eqp_mandante_primeito_tempo_total_gol + a.eqp_visitante_primeito_tempo_total_gol ) as totalGolHT,
 					( a.eqp_mandante_total_gol + a.eqp_visitante_total_gol ) as totalGolFT,
 			
@@ -142,6 +145,7 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 					( a.eqp_mandante_total_escanteio + a.eqp_visitante_total_escanteio ) as totalEscanteioFT
 			
 			FROM jogo as a
+					join equipe as mandante on ( a.eqp_mandante_id = mandante.id )
 			where a.campeonato_id = ?1
 					and a.eqp_visitante_id = ?2
 			order by a.numero_rodada desc 

@@ -2,6 +2,8 @@ package br.com.claudemirojr.trade.model.repository;
 
 public interface IJogoDados {
 	Integer getNumeroRodada();
+	
+	String getEquipe();
 
 	Double getTotalGolHT();
 
