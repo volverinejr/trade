@@ -30,7 +30,7 @@ import jakarta.validation.Valid;
 @Tag(name = "Jogo", description = "Endpoints para gerenciamento dos jogos")
 @RestController
 @RequestMapping("${url.base}/jogo/v1")
-@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_JOGO_ALL')")
+@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TRADE_JOGO_ALL')")
 public class JogoController {
 
 	@Autowired
@@ -84,7 +84,7 @@ public class JogoController {
 
 	@Operation(summary = "Busca os dados de um jogo pelo id")
 	@GetMapping("/{id}")
-	public JogoResponseDto findById(@PathVariable("id") Long id) {
+	public JogoResponseDto findByAuditId(@PathVariable("id") Long id) {
 		return jogoService.findById(id);
 	}
 	

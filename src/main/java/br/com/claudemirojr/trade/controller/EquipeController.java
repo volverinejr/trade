@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 @Tag(name = "Equipe", description = "Endpoints para gerenciamento das equipes")
 @RestController
 @RequestMapping("${url.base}/equipe/v1")
-@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_EQUIPE_ALL')")
+@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TRADE_EQUIPE_ALL')")
 public class EquipeController {
 
 	@Autowired
@@ -93,7 +93,7 @@ public class EquipeController {
 
 	@Operation(summary = "Busca os dados de uma equipe pelo id")
 	@GetMapping("/{id}")
-	public EquipeResponseDto findById(@PathVariable("id") Long id) {
+	public EquipeResponseDto findByAuditId(@PathVariable("id") Long id) {
 		return equipeService.findById(id);
 	}
 

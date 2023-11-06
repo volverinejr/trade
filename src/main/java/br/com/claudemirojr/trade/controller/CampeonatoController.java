@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 @Tag(name = "Campeonato", description = "Endpoints para gerenciamento dos campeonatos")
 @RestController
 @RequestMapping("${url.base}/campeonato/v1")
-@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_CAMPEONATO_ALL')")
+@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TRADE_CAMPEONATO_ALL')")
 public class CampeonatoController {
 
 	@Autowired
@@ -103,7 +103,7 @@ public class CampeonatoController {
 
 	@Operation(summary = "Busca os dados de um campeonato pelo id")
 	@GetMapping("/{id}")
-	public CampeonatoResponseDto findById(@PathVariable("id") Long id) {
+	public CampeonatoResponseDto findByAuditId(@PathVariable("id") Long id) {
 		return campeonatoService.findById(id);
 	}
 

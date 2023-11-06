@@ -24,7 +24,7 @@ public class AuditConsultas {
 	@Value("${spring.application.name}")
 	private String servico;
 
-	@Pointcut(value = "execution(* br.com.claudemirojr.*.controller.*.findBy*(..) )")
+	@Pointcut(value = "execution(* br.com.claudemirojr.*.controller.*.findByAudit*(..) )")
 	public void myPointcut() {
 	}
 
