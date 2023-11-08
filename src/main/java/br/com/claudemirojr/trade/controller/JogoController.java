@@ -89,17 +89,17 @@ public class JogoController {
 	}
 	
 	
-	@Operation(summary = "Análise do mandante X visitante em um determinado campeonato")
-	@GetMapping("/analise/campeonato/{idCampeonato}/mandante/{idMandante}/visitante/{idVisitante}")
-	public JogoAnaliseResponseDto findByAnaliseMandanteXVisitante( @PathVariable Long idCampeonato, @PathVariable Long idMandante, @PathVariable Long idVisitante) {
-		return jogoService.findByAnaliseMandanteXVisitante(idCampeonato, idMandante, idVisitante);
+	@Operation(summary = "Análise do mandante X visitante em um determinado campeonato, especificando o número de jogos a ser analisado")
+	@GetMapping("/analise/campeonato/{idCampeonato}/mandante/{idMandante}/visitante/{idVisitante}/jogos/{limiteDeJogos}")
+	public JogoAnaliseResponseDto findByAnaliseMandanteXVisitante( @PathVariable Long idCampeonato, @PathVariable Long idMandante, @PathVariable Long idVisitante, @PathVariable Long limiteDeJogos) {
+		return jogoService.findByAnaliseMandanteXVisitante(idCampeonato, idMandante, idVisitante, limiteDeJogos);
 	}
 	
 	
-	@Operation(summary = "Jogos do mandante X visitante em um determinado campeonato")
-	@GetMapping("/dados/campeonato/{idCampeonato}/mandante/{idMandante}/visitante/{idVisitante}")
-	public JogoDadosResponseDto findByJogoMandanteXVisitante( @PathVariable Long idCampeonato, @PathVariable Long idMandante, @PathVariable Long idVisitante) {
-		return jogoService.findByJogoMandanteXVisitante(idCampeonato, idMandante, idVisitante);
+	@Operation(summary = "Jogos do mandante X visitante em um determinado campeonato, especificando o número de jogos a ser analisado")
+	@GetMapping("/dados/campeonato/{idCampeonato}/mandante/{idMandante}/visitante/{idVisitante}/jogos/{limiteDeJogos}")
+	public JogoDadosResponseDto findByJogoMandanteXVisitante( @PathVariable Long idCampeonato, @PathVariable Long idMandante, @PathVariable Long idVisitante, @PathVariable Long limiteDeJogos) {
+		return jogoService.findByJogoMandanteXVisitante(idCampeonato, idMandante, idVisitante, limiteDeJogos);
 	}
 	
 

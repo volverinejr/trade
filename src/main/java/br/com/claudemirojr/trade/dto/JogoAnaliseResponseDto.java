@@ -1,6 +1,7 @@
 package br.com.claudemirojr.trade.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.claudemirojr.trade.model.entity.Campeonato;
@@ -26,6 +27,8 @@ public class JogoAnaliseResponseDto implements Serializable {
 	private JogoAnaliseResponseEquipeDto analiseMandante;
 
 	private List<IJogoDados> jogosMandante;
+	
+	private ArrayList<String> equipeMandanteMercadoResultadoPalpite;
 
 	//VISITANTE
 	private Equipe equipeVisitante;
@@ -33,5 +36,8 @@ public class JogoAnaliseResponseDto implements Serializable {
 	private JogoAnaliseResponseEquipeDto analiseVisitante;
 
 	private List<IJogoDados> jogosVisitante;
+	
+	private ArrayList<String> equipeVisitanteMercadoResultadoPalpite;
+	
 
 }

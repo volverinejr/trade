@@ -61,10 +61,10 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 				where a.campeonato_id = ?1
 						and a.eqp_mandante_id = ?2
 				order by a.numero_rodada desc 
-				limit 5
+				limit ?3
 			    ) as resultSub
 			""", nativeQuery = true )	
-	Optional<IJogoResultAnalise> findAnaliseMandante(Long idCampeonato, Long idMandante);
+	Optional<IJogoResultAnalise> findAnaliseMandante(Long idCampeonato, Long idMandante, Long limiteDeJogos);
 	
 	
 	@Query(value="""
@@ -106,10 +106,10 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 			where a.campeonato_id = ?1
 					and a.eqp_visitante_id = ?2
 			order by a.numero_rodada desc 
-			limit 5
+			limit ?3
 			) as resultSub				
 			""", nativeQuery = true )	
-		Optional<IJogoResultAnalise> findAnaliseVisitante(Long idCampeonato, Long idVisitante);
+		Optional<IJogoResultAnalise> findAnaliseVisitante(Long idCampeonato, Long idVisitante, Long limiteDeJogos);
 	
 	
 	
@@ -122,16 +122,28 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 					( a.eqp_mandante_total_gol + a.eqp_visitante_total_gol ) as totalGolFT,
 			
 					( a.eqp_mandante_primeito_tempo_total_escanteio + a.eqp_visitante_primeito_tempo_total_escanteio ) as totalEscanteioHT,
-					( a.eqp_mandante_total_escanteio + a.eqp_visitante_total_escanteio ) as totalEscanteioFT
+					( a.eqp_mandante_total_escanteio + a.eqp_visitante_total_escanteio ) as totalEscanteioFT,
+					
+					case(a.mandante_result_primeito_tempo_gol)
+						when 1 then 'green'
+						when 0 then 'orange'
+			            else 'red'
+					end resultHT,
+			        
+					case(a.mandante_result_gol)
+						when 1 then 'green'
+						when 0 then 'orange'
+			            else 'red'
+					end resultFT
 			
 			FROM jogo as a
 					join equipe as visitante on ( a.eqp_visitante_id = visitante.id ) 
 			where a.campeonato_id = ?1
 					and a.eqp_mandante_id = ?2
 			order by a.numero_rodada desc 
-			limit 5
+			limit ?3
 			""", nativeQuery = true)
-	List<IJogoDados> findJogosMandante(Long idCampeonato, Long idMandante);
+	List<IJogoDados> findJogosMandante(Long idCampeonato, Long idMandante, Long limiteDeJogos);
 	
 	
 	@Query(value="""
@@ -142,16 +154,30 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 					( a.eqp_mandante_total_gol + a.eqp_visitante_total_gol ) as totalGolFT,
 			
 					( a.eqp_mandante_primeito_tempo_total_escanteio + a.eqp_visitante_primeito_tempo_total_escanteio ) as totalEscanteioHT,
-					( a.eqp_mandante_total_escanteio + a.eqp_visitante_total_escanteio ) as totalEscanteioFT
+					( a.eqp_mandante_total_escanteio + a.eqp_visitante_total_escanteio ) as totalEscanteioFT,
+					
+					
+					case(a.mandante_result_primeito_tempo_gol)
+						when 1 then 'red'
+						when 0 then 'orange'
+			            else 'green'
+					end resultHT,
+			        
+					case(a.mandante_result_gol)
+						when 1 then 'red'
+						when 0 then 'orange'
+			            else 'green'
+					end resultFT
+					
 			
 			FROM jogo as a
 					join equipe as mandante on ( a.eqp_mandante_id = mandante.id )
 			where a.campeonato_id = ?1
 					and a.eqp_visitante_id = ?2
 			order by a.numero_rodada desc 
-			limit 5
+			limit ?3
 			""", nativeQuery = true)
-	List<IJogoDados> findJogosVisitante(Long idCampeonato, Long idVisitante);
+	List<IJogoDados> findJogosVisitante(Long idCampeonato, Long idVisitante, Long limiteDeJogos);
 	
 	
 	

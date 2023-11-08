@@ -12,5 +12,9 @@ public interface IJogoDados {
 	Double getTotalEscanteioHT();
 
 	Double getTotalEscanteioFT();
+	
+	String getResultHT();
+	
+	String getResultFT();
 
 }
