@@ -22,8 +22,8 @@ public interface JogoService {
 
 	public JogoResponseDto findById(Long id);
 
-	public JogoAnaliseResponseDto findByAnaliseMandanteXVisitante(Long idCampeonado, Long idMandante, Long idVisitante);
+	public JogoAnaliseResponseDto findByAnaliseMandanteXVisitante(Long idCampeonado, Long idMandante, Long idVisitante, Long limiteDeJogos);
 
-	public JogoDadosResponseDto findByJogoMandanteXVisitante(Long idCampeonado, Long idMandante, Long idVisitante);
+	public JogoDadosResponseDto findByJogoMandanteXVisitante(Long idCampeonado, Long idMandante, Long idVisitante, Long limiteDeJogos);
 
 }

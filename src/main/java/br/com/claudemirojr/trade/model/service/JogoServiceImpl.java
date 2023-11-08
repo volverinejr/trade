@@ -1,5 +1,7 @@
 package br.com.claudemirojr.trade.model.service;
 
+import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,6 +39,11 @@ public class JogoServiceImpl implements JogoService {
 	public String MSG_ENTIDADE_NAO_EXISTE = "Jogo não encontrado para id %d";
 	public String MSG_CAMPEONATO_NAO_EXISTE = "Campeonato não encontrado para id %d";
 	public String MSG_EQUIPE_NAO_EXISTE = "Equipe não encontrada para id %d";
+	
+	public static final String GREEN = "green";
+	public static final String RED = "red";
+	public static final String EMPATE = "orange";
+	
 
 	private JogoResponseDto convertToJogoResponseDto(Jogo entity) {
 		return ModelMaperConverter.parseObject(entity, JogoResponseDto.class);
@@ -168,9 +175,8 @@ public class JogoServiceImpl implements JogoService {
 
 	@Override
 	@Transactional(readOnly = true)
-	//@Cacheable(value = "trade_jogoAnaliseMandanteVisitanteCache")
 	public JogoAnaliseResponseDto findByAnaliseMandanteXVisitante(Long idCampeonado, Long idMandante,
-			Long idVisitante) {
+			Long idVisitante, Long limiteDeJogos) {
 		var campeonato = campeonatoRepository.findById(idCampeonado).orElseThrow(
 				() -> new ResourceNotFoundException(String.format(MSG_CAMPEONATO_NAO_EXISTE, idCampeonado)));
 
@@ -188,7 +194,7 @@ public class JogoServiceImpl implements JogoService {
 		JogoAnaliseResponseEquipeDto mandante = new JogoAnaliseResponseEquipeDto();
 		JogoAnaliseResponseEquipeDto visitante = new JogoAnaliseResponseEquipeDto();
 
-		var analisado = jogoRepository.findAnaliseMandante(idCampeonado, idMandante);
+		var analisado = jogoRepository.findAnaliseMandante(idCampeonado, idMandante, limiteDeJogos);
 		if (analisado.isPresent()) {
 			mandante.setMarcouMediaEscanteioHT(analisado.get().getMarcouMediaEscanteioHT());
 			mandante.setMarcouMediaEscanteioFT(analisado.get().getMarcouMediaEscanteioFT());
@@ -203,7 +209,7 @@ public class JogoServiceImpl implements JogoService {
 			jogoAnaliseResponseDto.setAnaliseMandante(mandante);
 		}
 
-		analisado = jogoRepository.findAnaliseVisitante(idCampeonado, idVisitante);
+		analisado = jogoRepository.findAnaliseVisitante(idCampeonado, idVisitante, limiteDeJogos);
 		if (analisado.isPresent()) {
 			visitante.setMarcouMediaEscanteioHT(analisado.get().getMarcouMediaEscanteioHT());
 			visitante.setMarcouMediaEscanteioFT(analisado.get().getMarcouMediaEscanteioFT());
@@ -219,11 +225,53 @@ public class JogoServiceImpl implements JogoService {
 		}
 		
 		
-		var jogosMandante = jogoRepository.findJogosMandante(idCampeonado, idMandante);
+		var jogosMandante = jogoRepository.findJogosMandante(idCampeonado, idMandante, limiteDeJogos);
 		jogoAnaliseResponseDto.setJogosMandante(jogosMandante);
 		
-		var jogosVisitante = jogoRepository.findJogosVisitante(idCampeonado, idVisitante);
+		var jogosVisitante = jogoRepository.findJogosVisitante(idCampeonado, idVisitante, limiteDeJogos);
 		jogoAnaliseResponseDto.setJogosVisitante(jogosVisitante);
+		
+		
+		//Mandante
+		var listGreen = jogosMandante.stream()
+                .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.GREEN))
+                .toList();
+		
+		var listRed = jogosMandante.stream()
+                .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.RED))
+                .toList();
+		
+		var listEmpate = jogosMandante.stream()
+                .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.EMPATE))
+                .toList();
+		
+		
+		ArrayList<String> palpitesMandante = new ArrayList<>();
+		palpitesMandante.add("Vitória: " + Double.valueOf( (listGreen.size() * 100)/jogosMandante.size() ) + "%");
+		palpitesMandante.add("Empate: " + Double.valueOf( (listEmpate.size() * 100)/jogosMandante.size() ) + "%");
+		palpitesMandante.add("Derrota: " + Double.valueOf( (listRed.size() * 100)/jogosMandante.size() ) + "%");
+		
+		jogoAnaliseResponseDto.setEquipeMandanteMercadoResultadoPalpite(palpitesMandante);
+		
+		
+		//Visitante
+		listGreen = jogosVisitante.stream()
+                .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.GREEN))
+                .toList();
+		
+		listRed = jogosVisitante.stream()
+                .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.RED))
+                .toList();
+		
+		listEmpate = jogosVisitante.stream()
+                .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.EMPATE))
+                .toList();
+
+		ArrayList<String> palpitesVisitante = new ArrayList<>();
+		palpitesVisitante.add("Vitória: " + Double.valueOf( (listGreen.size() * 100)/jogosMandante.size() ) + "%");
+		palpitesVisitante.add("Empate: " + Double.valueOf( (listEmpate.size() * 100)/jogosMandante.size() ) + "%");
+		palpitesVisitante.add("Derrota: " + Double.valueOf( (listRed.size() * 100)/jogosMandante.size() ) + "%");
+		jogoAnaliseResponseDto.setEquipeVisitanteMercadoResultadoPalpite(palpitesVisitante);
 		
 
 		return jogoAnaliseResponseDto;
@@ -231,7 +279,7 @@ public class JogoServiceImpl implements JogoService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public JogoDadosResponseDto findByJogoMandanteXVisitante(Long idCampeonado, Long idMandante, Long idVisitante) {
+	public JogoDadosResponseDto findByJogoMandanteXVisitante(Long idCampeonado, Long idMandante, Long idVisitante, Long limiteDeJogos) {
 		var campeonato = campeonatoRepository.findById(idCampeonado).orElseThrow(
 				() -> new ResourceNotFoundException(String.format(MSG_CAMPEONATO_NAO_EXISTE, idCampeonado)));
 
@@ -245,11 +293,11 @@ public class JogoServiceImpl implements JogoService {
 		jogoDadosResponseDto.setCampeonato(campeonato);
 
 		jogoDadosResponseDto.setEquipeMandante(equipeMandante);
-		var jogosMandante = jogoRepository.findJogosMandante(idCampeonado, idMandante);
+		var jogosMandante = jogoRepository.findJogosMandante(idCampeonado, idMandante, limiteDeJogos);
 		jogoDadosResponseDto.setJogoMandante(jogosMandante);
 
 		jogoDadosResponseDto.setEquipeVisitante(equipeVisitante);
-		var jogosVisitante = jogoRepository.findJogosVisitante(idCampeonado, idVisitante);
+		var jogosVisitante = jogoRepository.findJogosVisitante(idCampeonado, idVisitante, limiteDeJogos);
 		jogoDadosResponseDto.setJogoVisitante(jogosVisitante);
 
 		return jogoDadosResponseDto;
