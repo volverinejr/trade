@@ -36,15 +36,15 @@ public class JogoServiceImpl implements JogoService {
 	@Autowired
 	private EquipeRepository eqiupeRepository;
 
-	public String MSG_ENTIDADE_NAO_EXISTE = "Jogo não encontrado para id %d";
-	public String MSG_CAMPEONATO_NAO_EXISTE = "Campeonato não encontrado para id %d";
-	public String MSG_EQUIPE_NAO_EXISTE = "Equipe não encontrada para id %d";
+	private final String MSG_ENTIDADE_NAO_EXISTE = "Jogo não encontrado para id %d";
+	private final String MSG_CAMPEONATO_NAO_EXISTE = "Campeonato não encontrado para id %d";
+	private final String MSG_EQUIPE_NAO_EXISTE = "Equipe não encontrada para id %d";
 	
-	public static final String GREEN = "green";
-	public static final String RED = "red";
-	public static final String EMPATE = "orange";
-	
+	private final String GREEN = "green";
+	private final String RED = "red";
+	private final String EMPATE = "orange";
 
+	
 	private JogoResponseDto convertToJogoResponseDto(Jogo entity) {
 		return ModelMaperConverter.parseObject(entity, JogoResponseDto.class);
 	}
@@ -225,14 +225,10 @@ public class JogoServiceImpl implements JogoService {
 		}
 		
 		
+		//Mandante
 		var jogosMandante = jogoRepository.findJogosMandante(idCampeonado, idMandante, limiteDeJogos);
 		jogoAnaliseResponseDto.setJogosMandante(jogosMandante);
 		
-		var jogosVisitante = jogoRepository.findJogosVisitante(idCampeonado, idVisitante, limiteDeJogos);
-		jogoAnaliseResponseDto.setJogosVisitante(jogosVisitante);
-		
-		
-		//Mandante
 		var listGreen = jogosMandante.stream()
                 .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.GREEN))
                 .toList();
@@ -247,14 +243,16 @@ public class JogoServiceImpl implements JogoService {
 		
 		
 		ArrayList<String> palpitesMandante = new ArrayList<>();
-		palpitesMandante.add("Vitória: " + Double.valueOf( (listGreen.size() * 100)/jogosMandante.size() ) + "%");
-		palpitesMandante.add("Empate: " + Double.valueOf( (listEmpate.size() * 100)/jogosMandante.size() ) + "%");
-		palpitesMandante.add("Derrota: " + Double.valueOf( (listRed.size() * 100)/jogosMandante.size() ) + "%");
-		
+		palpitesMandante.add( String.format( "Vitória: %.2f%%", this.regraDeTresSimples(jogosMandante.size(), listGreen.size())) );
+		palpitesMandante.add( String.format( "Empate: %.2f%%", this.regraDeTresSimples(jogosMandante.size(), listEmpate.size())) );
+		palpitesMandante.add( String.format( "Derrota: %.2f%%", this.regraDeTresSimples(jogosMandante.size(), listRed.size())) );
 		jogoAnaliseResponseDto.setEquipeMandanteMercadoResultadoPalpite(palpitesMandante);
 		
 		
 		//Visitante
+		var jogosVisitante = jogoRepository.findJogosVisitante(idCampeonado, idVisitante, limiteDeJogos);
+		jogoAnaliseResponseDto.setJogosVisitante(jogosVisitante);
+
 		listGreen = jogosVisitante.stream()
                 .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.GREEN))
                 .toList();
@@ -268,13 +266,18 @@ public class JogoServiceImpl implements JogoService {
                 .toList();
 
 		ArrayList<String> palpitesVisitante = new ArrayList<>();
-		palpitesVisitante.add("Vitória: " + Double.valueOf( (listGreen.size() * 100)/jogosMandante.size() ) + "%");
-		palpitesVisitante.add("Empate: " + Double.valueOf( (listEmpate.size() * 100)/jogosMandante.size() ) + "%");
-		palpitesVisitante.add("Derrota: " + Double.valueOf( (listRed.size() * 100)/jogosMandante.size() ) + "%");
+		palpitesVisitante.add( String.format( "Vitória: %.2f%%", this.regraDeTresSimples(jogosVisitante.size(), listGreen.size())) );
+		palpitesVisitante.add( String.format( "Empate: %.2f%%", this.regraDeTresSimples(jogosVisitante.size(), listEmpate.size())) );
+		palpitesVisitante.add( String.format( "Derrota: %.2f%%", this.regraDeTresSimples(jogosVisitante.size(), listRed.size())) );
 		jogoAnaliseResponseDto.setEquipeVisitanteMercadoResultadoPalpite(palpitesVisitante);
-		
 
 		return jogoAnaliseResponseDto;
+	}
+	
+	
+	
+	private Double regraDeTresSimples(Integer valorTotal, Integer valorX) {
+		return Double.valueOf( (valorX * 100.00)/valorTotal );
 	}
 
 	@Override
