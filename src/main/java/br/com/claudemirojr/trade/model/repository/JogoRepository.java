@@ -128,13 +128,27 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 						when 1 then 'green'
 						when 0 then 'orange'
 			            else 'red'
-					end resultHT,
+					end resultGolHT,
 			        
 					case(a.mandante_result_gol)
 						when 1 then 'green'
 						when 0 then 'orange'
 			            else 'red'
-					end resultFT
+					end resultGolFT,
+					
+					
+					case(a.mandante_result_primeito_tempo_escanteio)
+						when 1 then 'green'
+						when 0 then 'orange'
+			            else 'red'
+					end resultEscanteioHT,
+			        
+					case(a.mandante_result_escanteio)
+						when 1 then 'green'
+						when 0 then 'orange'
+			            else 'red'
+					end resultEscanteioFT
+					
 			
 			FROM jogo as a
 					join equipe as visitante on ( a.eqp_visitante_id = visitante.id ) 
@@ -161,13 +175,26 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 						when 1 then 'red'
 						when 0 then 'orange'
 			            else 'green'
-					end resultHT,
+					end resultGolHT,
 			        
 					case(a.mandante_result_gol)
 						when 1 then 'red'
 						when 0 then 'orange'
 			            else 'green'
-					end resultFT
+					end resultGolFT,
+					
+					
+					case(a.mandante_result_primeito_tempo_escanteio)
+						when 1 then 'red'
+						when 0 then 'orange'
+			            else 'green'
+					end resultEscanteioHT,
+			        
+					case(a.mandante_result_escanteio)
+						when 1 then 'red'
+						when 0 then 'orange'
+			            else 'green'
+					end resultEscanteioFT
 					
 			
 			FROM jogo as a

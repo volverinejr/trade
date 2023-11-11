@@ -230,15 +230,15 @@ public class JogoServiceImpl implements JogoService {
 		jogoAnaliseResponseDto.setJogosMandante(jogosMandante);
 		
 		var listGreen = jogosMandante.stream()
-                .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.GREEN))
+                .filter(IJogoDados -> IJogoDados.getResultGolFT().equals(this.GREEN))
                 .toList();
 		
 		var listRed = jogosMandante.stream()
-                .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.RED))
+                .filter(IJogoDados -> IJogoDados.getResultGolFT().equals(this.RED))
                 .toList();
 		
 		var listEmpate = jogosMandante.stream()
-                .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.EMPATE))
+                .filter(IJogoDados -> IJogoDados.getResultGolFT().equals(this.EMPATE))
                 .toList();
 		
 		
@@ -254,15 +254,15 @@ public class JogoServiceImpl implements JogoService {
 		jogoAnaliseResponseDto.setJogosVisitante(jogosVisitante);
 
 		listGreen = jogosVisitante.stream()
-                .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.GREEN))
+                .filter(IJogoDados -> IJogoDados.getResultGolFT().equals(this.GREEN))
                 .toList();
 		
 		listRed = jogosVisitante.stream()
-                .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.RED))
+                .filter(IJogoDados -> IJogoDados.getResultGolFT().equals(this.RED))
                 .toList();
 		
 		listEmpate = jogosVisitante.stream()
-                .filter(IJogoDados -> IJogoDados.getResultFT().equals(this.EMPATE))
+                .filter(IJogoDados -> IJogoDados.getResultGolFT().equals(this.EMPATE))
                 .toList();
 
 		ArrayList<String> palpitesVisitante = new ArrayList<>();
