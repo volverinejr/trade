@@ -2,7 +2,7 @@ package br.com.claudemirojr.trade.model.repository;
 
 public interface IJogoDados {
 	Integer getNumeroRodada();
-	
+
 	String getEquipe();
 
 	Double getTotalGolHT();
@@ -12,9 +12,12 @@ public interface IJogoDados {
 	Double getTotalEscanteioHT();
 
 	Double getTotalEscanteioFT();
-	
-	String getResultHT();
-	
-	String getResultFT();
 
+	String getResultGolHT();
+
+	String getResultGolFT();
+
+	String getResultEscanteioHT();
+
+	String getResultEscanteioFT();
 }
