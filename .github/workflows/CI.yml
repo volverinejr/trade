@@ -47,23 +47,3 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGEM_NAME }}:${{ steps.tagging.outputs.new_version }}, ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGEM_NAME }}:latest
-  
-      - name: Install Kustomize
-        uses: imranismail/setup-kustomize@v2
-        
-      - name: update kustomization.yaml
-        run: |
-          cd k8s
-          kustomize edit set image ${{ env.IMAGEM_NAME }}=${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGEM_NAME }}:${{ steps.tagging.outputs.new_version }}
-
-      - name: commit
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git commit -am "Bump docker tag ${{ steps.tagging.outputs.new_version }}"
-
-      - name: Push
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-        
