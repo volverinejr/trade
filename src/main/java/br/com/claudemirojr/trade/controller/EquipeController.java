@@ -1,10 +1,10 @@
 package br.com.claudemirojr.trade.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,12 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.claudemirojr.trade.dto.EquipeDto;
 import br.com.claudemirojr.trade.dto.EquipeResponseDto;
-import br.com.claudemirojr.trade.model.ParamsRequestModel;
 import br.com.claudemirojr.trade.model.service.EquipeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,7 +27,7 @@ import jakarta.validation.Valid;
 @Tag(name = "Equipe", description = "Endpoints para gerenciamento das equipes")
 @RestController
 @RequestMapping("${url.base}/equipe/v1")
-@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TRADE_EQUIPE_ALL')")
+@PreAuthorize("hasAnyAuthority('SCOPE_ADMIN', 'SCOPE_TRADE_ADMIN')")
 public class EquipeController {
 
 	@Autowired
@@ -63,30 +61,30 @@ public class EquipeController {
 
 	@Operation(summary = "Busca os dados de todas as equipes")
 	@GetMapping
-	public ResponseEntity<?> findAll(@RequestParam Map<String, String> params) {
-		ParamsRequestModel prm = new ParamsRequestModel(params);
+	public ResponseEntity<?> findAll(Pageable pageable) {
+		
 
-		Page<EquipeResponseDto> registros = equipeService.findAll(prm);
+		Page<EquipeResponseDto> registros = equipeService.findAll(pageable);
 
 		return ResponseEntity.ok(registros);
 	}
 
 	@Operation(summary = "Filtra os dados das equipes pelo id")
 	@GetMapping("/search-id-maior-igual/{id}")
-	public ResponseEntity<?> findAllIdMaiorIgual(@PathVariable Long id, @RequestParam Map<String, String> params) {
-		ParamsRequestModel prm = new ParamsRequestModel(params);
+	public ResponseEntity<?> findAllIdMaiorIgual(@PathVariable Long id, Pageable pageable) {
+		
 
-		Page<EquipeResponseDto> registros = equipeService.findAllIdMaiorIgual(id, prm);
+		Page<EquipeResponseDto> registros = equipeService.findAllIdMaiorIgual(id, pageable);
 
 		return ResponseEntity.ok(registros);
 	}
 
 	@Operation(summary = "Filtra os dados das equipes pelo nome")
 	@GetMapping("/search-nome/{nome}")
-	public ResponseEntity<?> findAllNomeContem(@PathVariable String nome, @RequestParam Map<String, String> params) {
-		ParamsRequestModel prm = new ParamsRequestModel(params);
+	public ResponseEntity<?> findAllNomeContem(@PathVariable String nome, Pageable pageable) {
+		
 
-		Page<EquipeResponseDto> registros = equipeService.findAllNomeContem(nome, prm);
+		Page<EquipeResponseDto> registros = equipeService.findAllNomeContem(nome, pageable);
 
 		return ResponseEntity.ok(registros);
 	}
