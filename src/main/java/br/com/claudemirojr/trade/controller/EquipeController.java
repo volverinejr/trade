@@ -68,6 +68,8 @@ public class EquipeController {
 
 		return ResponseEntity.ok(registros);
 	}
+	
+	
 
 	@Operation(summary = "Filtra os dados das equipes pelo id")
 	@GetMapping("/search-id-maior-igual/{id}")
