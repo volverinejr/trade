@@ -15,7 +15,6 @@ import br.com.claudemirojr.trade.converter.ModelMaperConverter;
 import br.com.claudemirojr.trade.dto.EquipeDto;
 import br.com.claudemirojr.trade.dto.EquipeResponseDto;
 import br.com.claudemirojr.trade.exception.ResourceNotFoundException;
-import br.com.claudemirojr.trade.model.ParamsRequestModel;
 import br.com.claudemirojr.trade.model.entity.Equipe;
 import br.com.claudemirojr.trade.model.repository.EquipeRepository;
 import br.com.claudemirojr.trade.util.Paginacao;
@@ -121,6 +120,24 @@ public class EquipeServiceImpl implements EquipeService {
 		var registros = equipeRepository.findAllByOrderByNomeAsc();
 
 		return registros.stream().map(this::convertToEquipeResponseDto).collect(Collectors.toList());
+	}
+
+	@Override
+	public Page<EquipeResponseDto> findAllPorIdOrNome(String valor, Pageable pageable) {
+	
+		pageable = paginacao.getPageable(pageable);
+		
+		Page<Equipe> page;
+		
+		if(paginacao.isStringNumeric(valor))
+			
+			page = equipeRepository.findByIdGreaterThanEqual(Long.parseLong(valor), pageable);
+		else {
+			page= equipeRepository.findByNomeIgnoreCaseContaining(valor, pageable);
+		}
+		
+		
+		return page.map(this::convertToEquipeResponseDto);
 	}
 
 }

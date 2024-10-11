@@ -25,5 +25,7 @@ public interface EquipeService {
 	public EquipeResponseDto findById(Long id);
 
 	public List<EquipeResponseDto> findAllOrderNome();
+	
+	public Page<EquipeResponseDto> findAllPorIdOrNome(String valor, Pageable pageable);
 
 }

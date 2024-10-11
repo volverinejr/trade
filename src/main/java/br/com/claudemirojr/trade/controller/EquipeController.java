@@ -52,7 +52,6 @@ public class EquipeController {
 
 	@Operation(summary = "Exclui uma equipe")
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
 	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
 		equipeService.delete(id);
 
@@ -101,6 +100,14 @@ public class EquipeController {
 	@GetMapping("/search-all")
 	public ResponseEntity<?> carregarCampeonatosAtivos() {
 		List<EquipeResponseDto> registros = equipeService.findAllOrderNome();
+
+		return ResponseEntity.ok(registros);
+	}
+	
+	
+	@GetMapping("/filter/{valor}")
+	public ResponseEntity<?> findAllFilter(@PathVariable("valor") String valor, Pageable pageable) {
+		Page<EquipeResponseDto> registros = equipeService.findAllPorIdOrNome(valor, pageable);
 
 		return ResponseEntity.ok(registros);
 	}
