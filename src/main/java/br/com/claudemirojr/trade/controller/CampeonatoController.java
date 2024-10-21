@@ -1,10 +1,10 @@
 package br.com.claudemirojr.trade.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,12 +15,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.claudemirojr.trade.dto.CampeonatoDto;
 import br.com.claudemirojr.trade.dto.CampeonatoResponseDto;
-import br.com.claudemirojr.trade.model.ParamsRequestModel;
 import br.com.claudemirojr.trade.model.service.CampeonatoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,7 +27,7 @@ import jakarta.validation.Valid;
 @Tag(name = "Campeonato", description = "Endpoints para gerenciamento dos campeonatos")
 @RestController
 @RequestMapping("${url.base}/campeonato/v1")
-@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TRADE_CAMPEONATO_ALL')")
+@PreAuthorize("hasAnyAuthority('SCOPE_ADMIN', 'SCOPE_TRADE_CAMPEONATO_ADMIN')")
 public class CampeonatoController {
 
 	@Autowired
@@ -62,30 +60,27 @@ public class CampeonatoController {
 
 	@Operation(summary = "Busca os dados de todos os campeonatos")
 	@GetMapping
-	public ResponseEntity<?> findAll(@RequestParam Map<String, String> params) {
-		ParamsRequestModel prm = new ParamsRequestModel(params);
+	public ResponseEntity<?> findAll(Pageable pageable) {
 
-		Page<CampeonatoResponseDto> registros = campeonatoService.findAll(prm);
+		Page<CampeonatoResponseDto> registros = campeonatoService.findAll(pageable);
 
 		return ResponseEntity.ok(registros);
 	}
 
 	@Operation(summary = "Filtra os dados dos campeonatos pelo id")
 	@GetMapping("/search-id-maior-igual/{id}")
-	public ResponseEntity<?> findAllIdMaiorIgual(@PathVariable Long id, @RequestParam Map<String, String> params) {
-		ParamsRequestModel prm = new ParamsRequestModel(params);
+	public ResponseEntity<?> findAllIdMaiorIgual(@PathVariable Long id, Pageable pageable) {
 
-		Page<CampeonatoResponseDto> registros = campeonatoService.findAllIdMaiorIgual(id, prm);
+		Page<CampeonatoResponseDto> registros = campeonatoService.findAllIdMaiorIgual(id, pageable);
 
 		return ResponseEntity.ok(registros);
 	}
 
 	@Operation(summary = "Filtra os dados dos campeonatos pelo nome")
 	@GetMapping("/search-nome/{nome}")
-	public ResponseEntity<?> findAllNomeContem(@PathVariable String nome, @RequestParam Map<String, String> params) {
-		ParamsRequestModel prm = new ParamsRequestModel(params);
+	public ResponseEntity<?> findAllNomeContem(@PathVariable String nome, Pageable pageable) {
 
-		Page<CampeonatoResponseDto> registros = campeonatoService.findAllNomeContem(nome, prm);
+		Page<CampeonatoResponseDto> registros = campeonatoService.findAllNomeContem(nome, pageable);
 
 		return ResponseEntity.ok(registros);
 	}
@@ -105,6 +100,13 @@ public class CampeonatoController {
 	@GetMapping("/{id}")
 	public CampeonatoResponseDto findByAuditId(@PathVariable("id") Long id) {
 		return campeonatoService.findById(id);
+	}
+	
+	@GetMapping("/filter/{valor}")
+	public ResponseEntity<?> findAllFilter(@PathVariable("valor") String valor, Pageable pageable) {
+		Page<CampeonatoResponseDto> registros = campeonatoService.findAllPorIdOrNome(valor, pageable);
+
+		return ResponseEntity.ok(registros);
 	}
 
 }

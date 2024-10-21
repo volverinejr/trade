@@ -15,15 +15,18 @@ import br.com.claudemirojr.trade.converter.ModelMaperConverter;
 import br.com.claudemirojr.trade.dto.CampeonatoDto;
 import br.com.claudemirojr.trade.dto.CampeonatoResponseDto;
 import br.com.claudemirojr.trade.exception.ResourceNotFoundException;
-import br.com.claudemirojr.trade.model.ParamsRequestModel;
 import br.com.claudemirojr.trade.model.entity.Campeonato;
 import br.com.claudemirojr.trade.model.repository.CampeonatoRepository;
+import br.com.claudemirojr.trade.util.Paginacao;
 
 @Service
 public class CampeonatoServiceImpl implements CampeonatoService {
 
 	@Autowired
 	private CampeonatoRepository campeonatoRepository;
+	
+	@Autowired
+	private Paginacao paginacao;
 
 	public String MSG_ENTIDADE_NAO_EXISTE = "Campeonato não encontrado para id %d";
 
@@ -70,8 +73,9 @@ public class CampeonatoServiceImpl implements CampeonatoService {
 	@Override
 	@Transactional(readOnly = true)
 	@Cacheable(value = "trade_campeonatoCache")
-	public Page<CampeonatoResponseDto> findAll(ParamsRequestModel prm) {
-		Pageable pageable = prm.toSpringPageRequest();
+	public Page<CampeonatoResponseDto> findAll(Pageable pageable) {
+		
+		pageable = paginacao.getPageable(pageable);
 
 		var page = campeonatoRepository.findAll(pageable);
 
@@ -81,8 +85,8 @@ public class CampeonatoServiceImpl implements CampeonatoService {
 	@Override
 	@Transactional(readOnly = true)
 	@Cacheable(value = "trade_campeonatoCache")
-	public Page<CampeonatoResponseDto> findAllIdMaiorIgual(Long id, ParamsRequestModel prm) {
-		Pageable pageable = prm.toSpringPageRequest();
+	public Page<CampeonatoResponseDto> findAllIdMaiorIgual(Long id, Pageable pageable) {
+		pageable = paginacao.getPageable(pageable);
 
 		var page = campeonatoRepository.findByIdGreaterThanEqual(id, pageable);
 
@@ -92,8 +96,8 @@ public class CampeonatoServiceImpl implements CampeonatoService {
 	@Override
 	@Transactional(readOnly = true)
 	@Cacheable(value = "trade_campeonatoCache")
-	public Page<CampeonatoResponseDto> findAllNomeContem(String nome, ParamsRequestModel prm) {
-		Pageable pageable = prm.toSpringPageRequest();
+	public Page<CampeonatoResponseDto> findAllNomeContem(String nome, Pageable pageable) {
+		pageable = paginacao.getPageable(pageable);
 
 		var page = campeonatoRepository.findByNomeIgnoreCaseContaining(nome, pageable);
 
@@ -118,5 +122,24 @@ public class CampeonatoServiceImpl implements CampeonatoService {
 
 		return registros.stream().map(this::convertToCampeonatoResponseDto).collect(Collectors.toList());
 	}
+	
+	@Override
+	public Page<CampeonatoResponseDto> findAllPorIdOrNome(String valor, Pageable pageable) {
+	
+		pageable = paginacao.getPageable(pageable);
+		
+		Page<Campeonato> page;
+		
+		if(paginacao.isStringNumeric(valor))
+			
+			page = campeonatoRepository.findByIdGreaterThanEqual(Long.parseLong(valor), pageable);
+		else {
+			page= campeonatoRepository.findByNomeIgnoreCaseContaining(valor, pageable);
+		}
+		
+		
+		return page.map(this::convertToCampeonatoResponseDto);
+	}
+
 
 }
