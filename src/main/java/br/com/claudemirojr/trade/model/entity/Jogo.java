@@ -43,6 +43,8 @@ public class Jogo extends EntityBase implements Serializable {
 	@OneToOne(fetch = FetchType.EAGER)
 	@NotNull
 	private Campeonato campeonato;
+	
+	
 
 	@Column(nullable = false)
 	private Integer numeroRodada;

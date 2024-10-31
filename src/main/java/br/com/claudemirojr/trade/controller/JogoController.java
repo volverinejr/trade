@@ -1,9 +1,8 @@
 package br.com.claudemirojr.trade.controller;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,14 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseDto;
 import br.com.claudemirojr.trade.dto.JogoDadosResponseDto;
 import br.com.claudemirojr.trade.dto.JogoDto;
 import br.com.claudemirojr.trade.dto.JogoResponseDto;
-import br.com.claudemirojr.trade.model.ParamsRequestModel;
 import br.com.claudemirojr.trade.model.service.JogoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +27,7 @@ import jakarta.validation.Valid;
 @Tag(name = "Jogo", description = "Endpoints para gerenciamento dos jogos")
 @RestController
 @RequestMapping("${url.base}/jogo/v1")
-@PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_TRADE_JOGO_ALL')")
+@PreAuthorize("hasAnyAuthority('SCOPE_ADMIN', 'SCOPE_TRADE_ADMIN')")
 public class JogoController {
 
 	@Autowired
@@ -55,7 +52,6 @@ public class JogoController {
 
 	@Operation(summary = "Exclui um jogo")
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
 	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
 		jogoService.delete(id);
 
@@ -64,20 +60,22 @@ public class JogoController {
 
 	@Operation(summary = "Busca os dados de todos os jogos")
 	@GetMapping
-	public ResponseEntity<?> findAll(@RequestParam Map<String, String> params) {
-		ParamsRequestModel prm = new ParamsRequestModel(params);
+	public ResponseEntity<?> findAll(Pageable pageable) {
+		
 
-		Page<JogoResponseDto> registros = jogoService.findAll(prm);
+		Page<JogoResponseDto> registros = jogoService.findAll(pageable);
 
 		return ResponseEntity.ok(registros);
 	}
+	
+	
 
 	@Operation(summary = "Filtra os dados dos jogos pelo id")
 	@GetMapping("/search-id-maior-igual/{id}")
-	public ResponseEntity<?> findAllIdMaiorIgual(@PathVariable Long id, @RequestParam Map<String, String> params) {
-		ParamsRequestModel prm = new ParamsRequestModel(params);
+	public ResponseEntity<?> findAllIdMaiorIgual(@PathVariable Long id,Pageable pageable) {
+		
 
-		Page<JogoResponseDto> registros = jogoService.findAllIdMaiorIgual(id, prm);
+		Page<JogoResponseDto> registros = jogoService.findAllIdMaiorIgual(id, pageable);
 
 		return ResponseEntity.ok(registros);
 	}

@@ -51,7 +51,6 @@ public class CampeonatoController {
 
 	@Operation(summary = "Exclui um campeonato")
 	@DeleteMapping("/{id}")
-	@PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
 	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
 		campeonatoService.delete(id);
 

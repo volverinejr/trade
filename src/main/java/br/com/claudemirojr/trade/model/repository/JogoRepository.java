@@ -15,7 +15,7 @@ import br.com.claudemirojr.trade.model.entity.Jogo;
 public interface JogoRepository extends JpaRepository<Jogo, Long> {
 
 	Page<Jogo> findByIdGreaterThanEqual(Long id, Pageable pageable);
-	
+
 	List<Jogo> findTop5ByCampeonatoAndEqpMandanteOrderByNumeroRodadaDesc(Campeonato campeonato, Equipe eqpMandante);
 
 	List<Jogo> findTop5ByCampeonatoAndEqpVisitanteOrderByNumeroRodadaDesc(Campeonato campeonato, Equipe eqpVisitante);
