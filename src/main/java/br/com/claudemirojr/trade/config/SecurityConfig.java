@@ -26,7 +26,7 @@ public class SecurityConfig {
 	private RSAPublicKey publicKey;
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.POST, "/newapi/token").permitAll()
 				.anyRequest().authenticated()).csrf(csrf -> csrf.disable())
 				.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
@@ -36,7 +36,7 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public JwtDecoder jwtDecoder() {
+	JwtDecoder jwtDecoder() {
 		return NimbusJwtDecoder.withPublicKey(publicKey).build();
 	}
 
