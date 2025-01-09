@@ -15,15 +15,18 @@ import br.com.claudemirojr.trade.converter.ModelMaperConverter;
 import br.com.claudemirojr.trade.dto.EquipeDto;
 import br.com.claudemirojr.trade.dto.EquipeResponseDto;
 import br.com.claudemirojr.trade.exception.ResourceNotFoundException;
-import br.com.claudemirojr.trade.model.ParamsRequestModel;
 import br.com.claudemirojr.trade.model.entity.Equipe;
 import br.com.claudemirojr.trade.model.repository.EquipeRepository;
+import br.com.claudemirojr.trade.util.Paginacao;
 
 @Service
 public class EquipeServiceImpl implements EquipeService {
 
 	@Autowired
 	private EquipeRepository equipeRepository;
+	
+	@Autowired
+	private Paginacao paginacao;
 
 	public String MSG_ENTIDADE_NAO_EXISTE = "Equipe não encontrada para id %d";
 
@@ -69,8 +72,9 @@ public class EquipeServiceImpl implements EquipeService {
 	@Override
 	@Transactional(readOnly = true)
 	@Cacheable(value = "trade_equipeCache")
-	public Page<EquipeResponseDto> findAll(ParamsRequestModel prm) {
-		Pageable pageable = prm.toSpringPageRequest();
+	public Page<EquipeResponseDto> findAll(Pageable pageable) {
+
+		pageable = paginacao.getPageable(pageable);
 
 		var page = equipeRepository.findAll(pageable);
 
@@ -80,8 +84,8 @@ public class EquipeServiceImpl implements EquipeService {
 	@Override
 	@Transactional(readOnly = true)
 	@Cacheable(value = "trade_equipeCache")
-	public Page<EquipeResponseDto> findAllIdMaiorIgual(Long id, ParamsRequestModel prm) {
-		Pageable pageable = prm.toSpringPageRequest();
+	public Page<EquipeResponseDto> findAllIdMaiorIgual(Long id, Pageable pageable) {
+		pageable = paginacao.getPageable(pageable);
 
 		var page = equipeRepository.findByIdGreaterThanEqual(id, pageable);
 
@@ -91,8 +95,8 @@ public class EquipeServiceImpl implements EquipeService {
 	@Override
 	@Transactional(readOnly = true)
 	@Cacheable(value = "trade_equipeCache")
-	public Page<EquipeResponseDto> findAllNomeContem(String nome, ParamsRequestModel prm) {
-		Pageable pageable = prm.toSpringPageRequest();
+	public Page<EquipeResponseDto> findAllNomeContem(String nome,Pageable pageable) {
+		pageable = paginacao.getPageable(pageable);
 
 		var page = equipeRepository.findByNomeIgnoreCaseContaining(nome, pageable);
 
@@ -116,6 +120,24 @@ public class EquipeServiceImpl implements EquipeService {
 		var registros = equipeRepository.findAllByOrderByNomeAsc();
 
 		return registros.stream().map(this::convertToEquipeResponseDto).collect(Collectors.toList());
+	}
+
+	@Override
+	public Page<EquipeResponseDto> findAllPorIdOrNome(String valor, Pageable pageable) {
+	
+		pageable = paginacao.getPageable(pageable);
+		
+		Page<Equipe> page;
+		
+		if(paginacao.isStringNumeric(valor))
+			
+			page = equipeRepository.findByIdGreaterThanEqual(Long.parseLong(valor), pageable);
+		else {
+			page= equipeRepository.findByNomeIgnoreCaseContaining(valor, pageable);
+		}
+		
+		
+		return page.map(this::convertToEquipeResponseDto);
 	}
 
 }

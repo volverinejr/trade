@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class JpaAuditingConfiguration {
 
 	@Bean
-	public AuditorAware<String> auditorProvider() {
+	AuditorAware<String> auditorProvider() {
 		return () -> Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication().getName());
 	}
 }

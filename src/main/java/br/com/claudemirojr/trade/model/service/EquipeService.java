@@ -3,10 +3,10 @@ package br.com.claudemirojr.trade.model.service;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import br.com.claudemirojr.trade.dto.EquipeDto;
 import br.com.claudemirojr.trade.dto.EquipeResponseDto;
-import br.com.claudemirojr.trade.model.ParamsRequestModel;
 
 public interface EquipeService {
 
@@ -16,14 +16,16 @@ public interface EquipeService {
 
 	public void delete(Long id);
 
-	public Page<EquipeResponseDto> findAll(ParamsRequestModel prm);
+	public Page<EquipeResponseDto> findAll(Pageable pageable);
 
-	public Page<EquipeResponseDto> findAllIdMaiorIgual(Long id, ParamsRequestModel prm);
+	public Page<EquipeResponseDto> findAllIdMaiorIgual(Long id, Pageable pageable);
 
-	public Page<EquipeResponseDto> findAllNomeContem(String nome, ParamsRequestModel prm);
+	public Page<EquipeResponseDto> findAllNomeContem(String nome, Pageable pageable);
 
 	public EquipeResponseDto findById(Long id);
 
 	public List<EquipeResponseDto> findAllOrderNome();
+	
+	public Page<EquipeResponseDto> findAllPorIdOrNome(String valor, Pageable pageable);
 
 }

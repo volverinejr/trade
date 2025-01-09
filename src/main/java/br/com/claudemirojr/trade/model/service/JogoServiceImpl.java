@@ -18,11 +18,11 @@ import br.com.claudemirojr.trade.dto.JogoDto;
 import br.com.claudemirojr.trade.dto.JogoResponseDto;
 import br.com.claudemirojr.trade.exception.ResourceNotFoundException;
 import br.com.claudemirojr.trade.exception.ResourceServiceValidationException;
-import br.com.claudemirojr.trade.model.ParamsRequestModel;
 import br.com.claudemirojr.trade.model.entity.Jogo;
 import br.com.claudemirojr.trade.model.repository.CampeonatoRepository;
 import br.com.claudemirojr.trade.model.repository.EquipeRepository;
 import br.com.claudemirojr.trade.model.repository.JogoRepository;
+import br.com.claudemirojr.trade.util.Paginacao;
 
 @Service
 public class JogoServiceImpl implements JogoService {
@@ -35,6 +35,9 @@ public class JogoServiceImpl implements JogoService {
 
 	@Autowired
 	private EquipeRepository eqiupeRepository;
+	
+	@Autowired
+	private Paginacao paginacao;
 
 	private final String MSG_ENTIDADE_NAO_EXISTE = "Jogo não encontrado para id %d";
 	private final String MSG_CAMPEONATO_NAO_EXISTE = "Campeonato não encontrado para id %d";
@@ -144,8 +147,8 @@ public class JogoServiceImpl implements JogoService {
 	@Override
 	@Transactional(readOnly = true)
 	@Cacheable(value = "trade_jogoCache")
-	public Page<JogoResponseDto> findAll(ParamsRequestModel prm) {
-		Pageable pageable = prm.toSpringPageRequest();
+	public Page<JogoResponseDto> findAll(Pageable pageable) {
+		pageable = paginacao.getPageable(pageable);
 
 		var page = jogoRepository.findAll(pageable);
 
@@ -155,23 +158,25 @@ public class JogoServiceImpl implements JogoService {
 	@Override
 	@Transactional(readOnly = true)
 	@Cacheable(value = "trade_jogoCache")
-	public Page<JogoResponseDto> findAllIdMaiorIgual(Long id, ParamsRequestModel prm) {
-		Pageable pageable = prm.toSpringPageRequest();
+	public Page<JogoResponseDto> findAllIdMaiorIgual(Long id, Pageable pageable) {
+		pageable = paginacao.getPageable(pageable);
 
 		var page = jogoRepository.findByIdGreaterThanEqual(id, pageable);
 
 		return page.map(this::convertToJogoResponseDto);
 	}
+	
 
 	@Override
 	@Transactional(readOnly = true)
-	@Cacheable(value = "trade_jogoCache")
+	//@Cacheable(value = "trade_jogoCache")
 	public JogoResponseDto findById(Long id) {
 		var entity = jogoRepository.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException(String.format(MSG_ENTIDADE_NAO_EXISTE, id)));
 
 		return convertToJogoResponseDto(entity);
 	}
+	
 
 	@Override
 	@Transactional(readOnly = true)
