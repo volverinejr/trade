@@ -43,9 +43,9 @@ public class JogoServiceImpl implements JogoService {
 	private final String MSG_CAMPEONATO_NAO_EXISTE = "Campeonato não encontrado para id %d";
 	private final String MSG_EQUIPE_NAO_EXISTE = "Equipe não encontrada para id %d";
 	
-	private final String GREEN = "green";
-	private final String RED = "red";
-	private final String EMPATE = "orange";
+	private final String GREEN = "success";
+	private final String RED = "danger";
+	private final String EMPATE = "warning";
 
 	
 	private JogoResponseDto convertToJogoResponseDto(Jogo entity) {

@@ -125,28 +125,28 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 					( a.eqp_mandante_total_escanteio + a.eqp_visitante_total_escanteio ) as totalEscanteioFT,
 					
 					case(a.mandante_result_primeito_tempo_gol)
-						when 1 then 'green'
-						when 0 then 'orange'
-			            else 'red'
+						when 1 then 'success'
+						when 0 then 'warning'
+			            else 'danger'
 					end resultGolHT,
 			        
 					case(a.mandante_result_gol)
-						when 1 then 'green'
-						when 0 then 'orange'
-			            else 'red'
+						when 1 then 'success'
+						when 0 then 'warning'
+			            else 'danger'
 					end resultGolFT,
 					
 					
 					case(a.mandante_result_primeito_tempo_escanteio)
-						when 1 then 'green'
-						when 0 then 'orange'
-			            else 'red'
+						when 1 then 'success'
+						when 0 then 'warning'
+			            else 'danger'
 					end resultEscanteioHT,
 			        
 					case(a.mandante_result_escanteio)
-						when 1 then 'green'
-						when 0 then 'orange'
-			            else 'red'
+						when 1 then 'success'
+						when 0 then 'warning'
+			            else 'danger'
 					end resultEscanteioFT
 					
 			
@@ -172,28 +172,28 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 					
 					
 					case(a.mandante_result_primeito_tempo_gol)
-						when 1 then 'red'
-						when 0 then 'orange'
-			            else 'green'
+						when 1 then 'danger'
+						when 0 then 'warning'
+			            else 'success'
 					end resultGolHT,
 			        
 					case(a.mandante_result_gol)
-						when 1 then 'red'
-						when 0 then 'orange'
-			            else 'green'
+						when 1 then 'danger'
+						when 0 then 'warning'
+			            else 'success'
 					end resultGolFT,
 					
 					
 					case(a.mandante_result_primeito_tempo_escanteio)
-						when 1 then 'red'
-						when 0 then 'orange'
-			            else 'green'
+						when 1 then 'danger'
+						when 0 then 'warning'
+			            else 'success'
 					end resultEscanteioHT,
 			        
 					case(a.mandante_result_escanteio)
-						when 1 then 'red'
-						when 0 then 'orange'
-			            else 'green'
+						when 1 then 'danger'
+						when 0 then 'warning'
+			            else 'success'
 					end resultEscanteioFT
 					
 			
