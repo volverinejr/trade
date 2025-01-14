@@ -20,4 +20,6 @@ public interface IJogoDados {
 	String getResultEscanteioHT();
 
 	String getResultEscanteioFT();
+	
+	String getResultPlacar();
 }

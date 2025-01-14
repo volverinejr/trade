@@ -147,7 +147,9 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 						when 1 then 'success'
 						when 0 then 'warning'
 			            else 'danger'
-					end resultEscanteioFT
+					end resultEscanteioFT,
+					
+					CONCAT(a.eqp_mandante_total_gol, ' X ', a.eqp_visitante_total_gol) as resultPlacar
 					
 			
 			FROM jogo as a
@@ -194,7 +196,9 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 						when 1 then 'danger'
 						when 0 then 'warning'
 			            else 'success'
-					end resultEscanteioFT
+					end resultEscanteioFT,
+					
+					CONCAT(a.eqp_mandante_total_gol, ' X ', a.eqp_visitante_total_gol) as resultPlacar
 					
 			
 			FROM jogo as a
