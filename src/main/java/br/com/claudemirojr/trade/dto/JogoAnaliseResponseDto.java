@@ -30,6 +30,8 @@ public class JogoAnaliseResponseDto implements Serializable {
 	
 	private ArrayList<String> equipeMandanteMercadoResultadoPalpite;
 
+	private ArrayList<String> equipeMandanteMercadoEscanteioPalpite;
+
 	//VISITANTE
 	private Equipe equipeVisitante;
 
@@ -39,5 +41,6 @@ public class JogoAnaliseResponseDto implements Serializable {
 	
 	private ArrayList<String> equipeVisitanteMercadoResultadoPalpite;
 	
+	private ArrayList<String> equipeVisitanteMercadoEscanteioPalpite;
 
 }

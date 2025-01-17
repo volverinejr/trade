@@ -254,6 +254,29 @@ public class JogoServiceImpl implements JogoService {
 		jogoAnaliseResponseDto.setEquipeMandanteMercadoResultadoPalpite(palpitesMandante);
 		
 		
+		
+		//escanteio
+		listGreen = jogosMandante.stream()
+                .filter(IJogoDados -> IJogoDados.getResultEscanteioFT().equals(this.GREEN))
+                .toList();
+		
+		listRed = jogosMandante.stream()
+                .filter(IJogoDados -> IJogoDados.getResultEscanteioFT().equals(this.RED))
+                .toList();
+		
+		listEmpate = jogosMandante.stream()
+                .filter(IJogoDados -> IJogoDados.getResultEscanteioFT().equals(this.EMPATE))
+                .toList();
+
+		ArrayList<String> palpitesMandanteEscanteio = new ArrayList<>();
+		palpitesMandanteEscanteio.add( String.format( "Vitória: %.2f%%", this.regraDeTresSimples(jogosMandante.size(), listGreen.size())) );
+		palpitesMandanteEscanteio.add( String.format( "Empate: %.2f%%", this.regraDeTresSimples(jogosMandante.size(), listEmpate.size())) );
+		palpitesMandanteEscanteio.add( String.format( "Derrota: %.2f%%", this.regraDeTresSimples(jogosMandante.size(), listRed.size())) );
+		jogoAnaliseResponseDto.setEquipeMandanteMercadoEscanteioPalpite(palpitesMandanteEscanteio);
+		
+		
+		
+		
 		//Visitante
 		var jogosVisitante = jogoRepository.findJogosVisitante(idCampeonado, idVisitante, limiteDeJogos);
 		jogoAnaliseResponseDto.setJogosVisitante(jogosVisitante);
@@ -275,6 +298,28 @@ public class JogoServiceImpl implements JogoService {
 		palpitesVisitante.add( String.format( "Empate: %.2f%%", this.regraDeTresSimples(jogosVisitante.size(), listEmpate.size())) );
 		palpitesVisitante.add( String.format( "Derrota: %.2f%%", this.regraDeTresSimples(jogosVisitante.size(), listRed.size())) );
 		jogoAnaliseResponseDto.setEquipeVisitanteMercadoResultadoPalpite(palpitesVisitante);
+		
+
+		//escanteio
+		listGreen = jogosVisitante.stream()
+                .filter(IJogoDados -> IJogoDados.getResultEscanteioFT().equals(this.GREEN))
+                .toList();
+		
+		listRed = jogosVisitante.stream()
+                .filter(IJogoDados -> IJogoDados.getResultEscanteioFT().equals(this.RED))
+                .toList();
+		
+		listEmpate = jogosVisitante.stream()
+                .filter(IJogoDados -> IJogoDados.getResultEscanteioFT().equals(this.EMPATE))
+                .toList();
+		
+		
+		ArrayList<String> palpitesVisitanteEscanteio = new ArrayList<>();
+		palpitesVisitanteEscanteio.add( String.format( "Vitória: %.2f%%", this.regraDeTresSimples(jogosVisitante.size(), listGreen.size())) );
+		palpitesVisitanteEscanteio.add( String.format( "Empate: %.2f%%", this.regraDeTresSimples(jogosVisitante.size(), listEmpate.size())) );
+		palpitesVisitanteEscanteio.add( String.format( "Derrota: %.2f%%", this.regraDeTresSimples(jogosVisitante.size(), listRed.size())) );
+		jogoAnaliseResponseDto.setEquipeVisitanteMercadoEscanteioPalpite(palpitesVisitanteEscanteio);
+		
 
 		return jogoAnaliseResponseDto;
 	}

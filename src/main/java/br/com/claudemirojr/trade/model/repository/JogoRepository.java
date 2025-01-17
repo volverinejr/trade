@@ -149,7 +149,8 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 			            else 'danger'
 					end resultEscanteioFT,
 					
-					CONCAT(a.eqp_mandante_total_gol, ' X ', a.eqp_visitante_total_gol) as resultPlacar
+					CONCAT(a.eqp_mandante_total_gol, ' X ', a.eqp_visitante_total_gol) as resultPlacar,
+					CONCAT(a.eqp_mandante_total_escanteio, ' X ', a.eqp_visitante_total_escanteio) as resultPlacarEscanteio
 					
 			
 			FROM jogo as a
@@ -198,7 +199,8 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 			            else 'success'
 					end resultEscanteioFT,
 					
-					CONCAT(a.eqp_mandante_total_gol, ' X ', a.eqp_visitante_total_gol) as resultPlacar
+					CONCAT(a.eqp_mandante_total_gol, ' X ', a.eqp_visitante_total_gol) as resultPlacar,
+					CONCAT(a.eqp_mandante_total_escanteio, ' X ', a.eqp_visitante_total_escanteio) as resultPlacarEscanteio
 					
 			
 			FROM jogo as a
