@@ -22,4 +22,6 @@ public interface IJogoDados {
 	String getResultEscanteioFT();
 	
 	String getResultPlacar();
+	
+	String getResultPlacarEscanteio();
 }
