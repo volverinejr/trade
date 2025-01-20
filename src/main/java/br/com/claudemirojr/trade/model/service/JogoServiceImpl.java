@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.claudemirojr.trade.converter.ModelMaperConverter;
+import br.com.claudemirojr.trade.dto.CampeonatoResponseDto;
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseDto;
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseEquipeDto;
 import br.com.claudemirojr.trade.dto.JogoDadosResponseDto;
@@ -18,6 +19,7 @@ import br.com.claudemirojr.trade.dto.JogoDto;
 import br.com.claudemirojr.trade.dto.JogoResponseDto;
 import br.com.claudemirojr.trade.exception.ResourceNotFoundException;
 import br.com.claudemirojr.trade.exception.ResourceServiceValidationException;
+import br.com.claudemirojr.trade.model.entity.Campeonato;
 import br.com.claudemirojr.trade.model.entity.Jogo;
 import br.com.claudemirojr.trade.model.repository.CampeonatoRepository;
 import br.com.claudemirojr.trade.model.repository.EquipeRepository;
@@ -176,6 +178,28 @@ public class JogoServiceImpl implements JogoService {
 
 		return convertToJogoResponseDto(entity);
 	}
+	
+	@Override
+	public Page<JogoResponseDto> findAllPorIdOrNome(String valor, Pageable pageable) {
+	
+		pageable = paginacao.getPageable(pageable);
+		
+		Page<Jogo> page;
+		
+		if(paginacao.isStringNumeric(valor))
+			
+			page = jogoRepository.findByIdGreaterThanEqual(Long.parseLong(valor), pageable);
+		
+		else {
+			//TODO: Fazer a busca por nome.
+			page = jogoRepository.findByIdGreaterThanEqual(Long.parseLong(valor), pageable);
+		}
+		
+		
+		
+		return page.map(this::convertToJogoResponseDto);
+	}
+
 	
 
 	@Override

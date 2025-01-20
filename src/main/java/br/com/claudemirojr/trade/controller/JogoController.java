@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.claudemirojr.trade.dto.CampeonatoResponseDto;
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseDto;
 import br.com.claudemirojr.trade.dto.JogoDadosResponseDto;
 import br.com.claudemirojr.trade.dto.JogoDto;
@@ -67,6 +68,14 @@ public class JogoController {
 
 		return ResponseEntity.ok(registros);
 	}
+	
+	@GetMapping("/filter/{valor}")
+	public ResponseEntity<?> findAllFilter(@PathVariable("valor") String valor, Pageable pageable) {
+		Page<JogoResponseDto> registros = jogoService.findAllPorIdOrNome(valor, pageable);
+
+		return ResponseEntity.ok(registros);
+	}
+
 	
 	
 

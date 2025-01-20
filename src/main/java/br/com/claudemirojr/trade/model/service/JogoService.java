@@ -20,6 +20,8 @@ public interface JogoService {
 
 	public Page<JogoResponseDto> findAllIdMaiorIgual(Long id, Pageable pageable);
 	
+	public Page<JogoResponseDto> findAllPorIdOrNome(String valor, Pageable pageable);
+	
 
 	public JogoResponseDto findById(Long id);
 
