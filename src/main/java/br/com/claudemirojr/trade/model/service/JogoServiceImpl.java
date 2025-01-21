@@ -1,6 +1,7 @@
 package br.com.claudemirojr.trade.model.service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.claudemirojr.trade.converter.ModelMaperConverter;
-import br.com.claudemirojr.trade.dto.CampeonatoResponseDto;
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseDto;
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseEquipeDto;
 import br.com.claudemirojr.trade.dto.JogoDadosResponseDto;
@@ -19,10 +19,11 @@ import br.com.claudemirojr.trade.dto.JogoDto;
 import br.com.claudemirojr.trade.dto.JogoResponseDto;
 import br.com.claudemirojr.trade.exception.ResourceNotFoundException;
 import br.com.claudemirojr.trade.exception.ResourceServiceValidationException;
-import br.com.claudemirojr.trade.model.entity.Campeonato;
 import br.com.claudemirojr.trade.model.entity.Jogo;
 import br.com.claudemirojr.trade.model.repository.CampeonatoRepository;
 import br.com.claudemirojr.trade.model.repository.EquipeRepository;
+import br.com.claudemirojr.trade.model.repository.IJogoPartida;
+import br.com.claudemirojr.trade.model.repository.IJogoRodadas;
 import br.com.claudemirojr.trade.model.repository.JogoRepository;
 import br.com.claudemirojr.trade.util.Paginacao;
 
@@ -379,5 +380,14 @@ public class JogoServiceImpl implements JogoService {
 
 		return jogoDadosResponseDto;
 	}
+	
+	public List<IJogoRodadas> obterQuantidadePorRodada(Long idCampeonato) {
+        return jogoRepository.FindNumeroRodadas(idCampeonato);
+    }
+	
+	public List<IJogoPartida> obterPartidaPorRodada(Long idCampeonato , Integer numeroRodada) {
+        
+		return jogoRepository.FindPartidaPorRodada(idCampeonato, numeroRodada);
+    }
 
 }

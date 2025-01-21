@@ -1,5 +1,7 @@
 package br.com.claudemirojr.trade.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,11 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.claudemirojr.trade.dto.CampeonatoResponseDto;
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseDto;
 import br.com.claudemirojr.trade.dto.JogoDadosResponseDto;
 import br.com.claudemirojr.trade.dto.JogoDto;
 import br.com.claudemirojr.trade.dto.JogoResponseDto;
+import br.com.claudemirojr.trade.model.repository.IJogoPartida;
+import br.com.claudemirojr.trade.model.repository.IJogoRodadas;
 import br.com.claudemirojr.trade.model.service.JogoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -75,8 +78,19 @@ public class JogoController {
 
 		return ResponseEntity.ok(registros);
 	}
-
 	
+	
+	@GetMapping("/quantidade-por-rodada/{id}")
+    public List<IJogoRodadas> getQuantidadePorRodada(@PathVariable("id") Long idCampeonato) {
+        return jogoService.obterQuantidadePorRodada(idCampeonato);
+    }
+	
+	@GetMapping("/campeonato/{id}/rodada/{rodada}")
+    public List<IJogoPartida> getPartidaPorRodada(@PathVariable("id") Long idCampeonato,@PathVariable("rodada") Integer numeroRodada) {
+        return jogoService.obterPartidaPorRodada(idCampeonato,numeroRodada);
+    }
+
+
 	
 
 	@Operation(summary = "Filtra os dados dos jogos pelo id")

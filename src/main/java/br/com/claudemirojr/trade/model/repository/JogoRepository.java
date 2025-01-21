@@ -215,6 +215,29 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 			""", nativeQuery = true)
 	List<IJogoDados> findJogosVisitante(Long idCampeonato, Long idVisitante, Long limiteDeJogos);
 	
+	@Query(value = """
+			select 	a.numero_rodada as numeroRodada,
+					count(1) as qtd
+				from jogo as a
+				where a.campeonato_id = ?1
+				group by a.numero_rodada
+				order by a.numero_rodada desc;
+			""", nativeQuery = true)
+	List<IJogoRodadas> FindNumeroRodadas(Long idCampeonato);
+	
+	
+	@Query(value = """
+			select 	a.id,
+				concat(mandante.nome, ' X ', visitante.nome) as Partida
+				from jogo as a
+						join equipe as mandante on ( a.eqp_mandante_id = mandante.id )
+				        join equipe as visitante on ( a.eqp_visitante_id = visitante.id )
+				where a.campeonato_id = ?1
+					  and a.numero_rodada = ?2
+				order by a.id;
+			""", nativeQuery = true)
+	List<IJogoPartida> FindPartidaPorRodada(Long idCampeonato , Integer numeroRodada);
+	
 	
 	
 	
