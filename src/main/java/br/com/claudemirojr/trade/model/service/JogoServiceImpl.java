@@ -1,6 +1,7 @@
 package br.com.claudemirojr.trade.model.service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -21,6 +22,8 @@ import br.com.claudemirojr.trade.exception.ResourceServiceValidationException;
 import br.com.claudemirojr.trade.model.entity.Jogo;
 import br.com.claudemirojr.trade.model.repository.CampeonatoRepository;
 import br.com.claudemirojr.trade.model.repository.EquipeRepository;
+import br.com.claudemirojr.trade.model.repository.IJogoPartida;
+import br.com.claudemirojr.trade.model.repository.IJogoRodadas;
 import br.com.claudemirojr.trade.model.repository.JogoRepository;
 import br.com.claudemirojr.trade.util.Paginacao;
 
@@ -176,6 +179,28 @@ public class JogoServiceImpl implements JogoService {
 
 		return convertToJogoResponseDto(entity);
 	}
+	
+	@Override
+	public Page<JogoResponseDto> findAllPorIdOrNome(String valor, Pageable pageable) {
+	
+		pageable = paginacao.getPageable(pageable);
+		
+		Page<Jogo> page;
+		
+		if(paginacao.isStringNumeric(valor))
+			
+			page = jogoRepository.findByIdGreaterThanEqual(Long.parseLong(valor), pageable);
+		
+		else {
+			//TODO: Fazer a busca por nome.
+			page = jogoRepository.findByIdGreaterThanEqual(Long.parseLong(valor), pageable);
+		}
+		
+		
+		
+		return page.map(this::convertToJogoResponseDto);
+	}
+
 	
 
 	@Override
@@ -355,5 +380,14 @@ public class JogoServiceImpl implements JogoService {
 
 		return jogoDadosResponseDto;
 	}
+	
+	public List<IJogoRodadas> obterQuantidadePorRodada(Long idCampeonato) {
+        return jogoRepository.FindNumeroRodadas(idCampeonato);
+    }
+	
+	public List<IJogoPartida> obterPartidaPorRodada(Long idCampeonato , Integer numeroRodada) {
+        
+		return jogoRepository.FindPartidaPorRodada(idCampeonato, numeroRodada);
+    }
 
 }
