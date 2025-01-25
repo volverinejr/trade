@@ -7,6 +7,7 @@ import java.util.List;
 import br.com.claudemirojr.trade.model.entity.Campeonato;
 import br.com.claudemirojr.trade.model.entity.Equipe;
 import br.com.claudemirojr.trade.model.repository.IJogoDados;
+import br.com.claudemirojr.trade.model.repository.IMelhorEquipe;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,12 @@ public class JogoAnaliseResponseDto implements Serializable {
 	private ArrayList<String> equipeMandanteMercadoResultadoPalpite;
 
 	private ArrayList<String> equipeMandanteMercadoEscanteioPalpite;
+	
+	private List<IMelhorEquipe> resultadoMelhorMandante;
+	
+	private List<IMelhorEquipe> resultadoMelhorMandanteEscanteio;
+
+	
 
 	//VISITANTE
 	private Equipe equipeVisitante;
@@ -42,5 +49,9 @@ public class JogoAnaliseResponseDto implements Serializable {
 	private ArrayList<String> equipeVisitanteMercadoResultadoPalpite;
 	
 	private ArrayList<String> equipeVisitanteMercadoEscanteioPalpite;
+	
+	private List<IMelhorEquipe> resultadoMelhorVisitante;
+	
+	private List<IMelhorEquipe> resultadoMelhorVisitanteEscanteio;
 
 }

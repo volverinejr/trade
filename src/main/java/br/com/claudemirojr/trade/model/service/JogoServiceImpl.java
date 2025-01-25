@@ -345,6 +345,16 @@ public class JogoServiceImpl implements JogoService {
 		palpitesVisitanteEscanteio.add( String.format( "Derrota: %.2f%%", this.regraDeTresSimples(jogosVisitante.size(), listRed.size())) );
 		jogoAnaliseResponseDto.setEquipeVisitanteMercadoEscanteioPalpite(palpitesVisitanteEscanteio);
 		
+		
+		
+		//resultado - lista dos melhores
+		jogoAnaliseResponseDto.setResultadoMelhorMandante( jogoRepository.resultadoMelhorMandante(idCampeonado) );
+		jogoAnaliseResponseDto.setResultadoMelhorVisitante( jogoRepository.resultadoMelhorVisitante(idCampeonado) );
+		
+		//resultado - lista dos melhores escanyeios
+		jogoAnaliseResponseDto.setResultadoMelhorMandanteEscanteio( jogoRepository.resultadoMelhorMandanteEscanteio(idCampeonado) );
+		jogoAnaliseResponseDto.setResultadoMelhorVisitanteEscanteio( jogoRepository.resultadoMelhorVisitanteEscanteio(idCampeonado) );
+		
 
 		return jogoAnaliseResponseDto;
 	}
