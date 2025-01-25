@@ -240,5 +240,84 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 	
 	
 	
+	@Query(value = """
+			select 	ROW_NUMBER() OVER (ORDER BY result.qtd desc, result.nome) as ordem,
+					result.*
+			from (
+				select 	b.nome,
+						count(1) as qtd
+				from jogo as a
+						join equipe as b on ( a.eqp_mandante_id = b.id )
+				where a.campeonato_id = ?1
+					  and a.eqp_mandante_total_gol > a.eqp_visitante_total_gol
+				 group by b.nome
+				 order by qtd desc
+				 ) as result;			
+			""", nativeQuery = true)
+	List<IMelhorEquipe> resultadoMelhorMandante(Long idCampeonato);	
+	
+	
+	@Query(value = """
+			
+			select 	ROW_NUMBER() OVER (ORDER BY result.qtd desc, result.nome) as ordem,
+					result.*
+			from (
+				select 	b.nome,
+						count(1) as qtd
+				from jogo as a
+						join equipe as b on ( a.eqp_visitante_id = b.id )
+				where a.campeonato_id = ?1
+					  and a.eqp_visitante_total_gol > a.eqp_mandante_total_gol
+				 group by b.nome
+				 order by qtd desc
+				 ) as result;
+	 			
+ 			""", nativeQuery = true)
+	List<IMelhorEquipe> resultadoMelhorVisitante(Long idCampeonato);
+	
+	
+	
+	@Query(value = """
+			select 	ROW_NUMBER() OVER (ORDER BY result.qtd desc, result.nome) as ordem,
+					result.*
+			from (
+				select 	b.nome,
+						count(1) as qtd
+				from jogo as a
+						join equipe as b on ( a.eqp_mandante_id = b.id )
+				where a.campeonato_id = ?1
+					  and a.eqp_mandante_total_escanteio > a.eqp_visitante_total_escanteio
+				 group by b.nome
+				 order by qtd desc
+				 ) as result;			
+			""", nativeQuery = true)
+	List<IMelhorEquipe> resultadoMelhorMandanteEscanteio(Long idCampeonato);	
+	
+	
+	
+	@Query(value = """
+			
+			select 	ROW_NUMBER() OVER (ORDER BY result.qtd desc, result.nome) as ordem,
+					result.*
+			from (
+				select 	b.nome,
+						count(1) as qtd
+				from jogo as a
+						join equipe as b on ( a.eqp_visitante_id = b.id )
+				where a.campeonato_id = ?1
+					  and a.eqp_visitante_total_escanteio > a.eqp_mandante_total_escanteio
+				 group by b.nome
+				 order by qtd desc
+				 ) as result;
+	 			
+ 			""", nativeQuery = true)
+	List<IMelhorEquipe> resultadoMelhorVisitanteEscanteio(Long idCampeonato);
+	
+		
+	
+	
+	
+	
+	
 	
 }
