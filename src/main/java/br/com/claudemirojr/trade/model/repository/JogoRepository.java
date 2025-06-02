@@ -64,7 +64,7 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 				where a.campeonato_id = ?1
 						and a.eqp_mandante_id = ?2
 				order by a.numero_rodada desc 
-				limit ?3
+				limit 5
 			    ) as resultSub
 			""", nativeQuery = true )	
 	Optional<IJogoResultAnalise> findAnaliseMandante(Long idCampeonato, Long idMandante, Long limiteDeJogos);
@@ -109,7 +109,7 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 			where a.campeonato_id = ?1
 					and a.eqp_visitante_id = ?2
 			order by a.numero_rodada desc 
-			limit ?3
+			limit 5
 			) as resultSub				
 			""", nativeQuery = true )	
 		Optional<IJogoResultAnalise> findAnaliseVisitante(Long idCampeonato, Long idVisitante, Long limiteDeJogos);
@@ -161,7 +161,7 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 			where a.campeonato_id = ?1
 					and a.eqp_mandante_id = ?2
 			order by a.numero_rodada desc 
-			limit ?3
+			limit 5
 			""", nativeQuery = true)
 	List<IJogoDados> findJogosMandante(Long idCampeonato, Long idMandante, Long limiteDeJogos);
 	
@@ -211,7 +211,7 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 			where a.campeonato_id = ?1
 					and a.eqp_visitante_id = ?2
 			order by a.numero_rodada desc 
-			limit ?3
+			limit 5
 			""", nativeQuery = true)
 	List<IJogoDados> findJogosVisitante(Long idCampeonato, Long idVisitante, Long limiteDeJogos);
 	
@@ -244,7 +244,8 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 			select 	ROW_NUMBER() OVER (ORDER BY result.qtd desc, result.nome) as ordem,
 					result.*
 			from (
-				select 	b.nome,
+				select 	b.id,
+						b.nome,
 						count(1) as qtd
 				from jogo as a
 						join equipe as b on ( a.eqp_mandante_id = b.id )
@@ -262,7 +263,8 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 			select 	ROW_NUMBER() OVER (ORDER BY result.qtd desc, result.nome) as ordem,
 					result.*
 			from (
-				select 	b.nome,
+				select 	b.id,
+						b.nome,
 						count(1) as qtd
 				from jogo as a
 						join equipe as b on ( a.eqp_visitante_id = b.id )
@@ -281,7 +283,8 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 			select 	ROW_NUMBER() OVER (ORDER BY result.qtd desc, result.nome) as ordem,
 					result.*
 			from (
-				select 	b.nome,
+				select 	b.id,
+						b.nome,
 						count(1) as qtd
 				from jogo as a
 						join equipe as b on ( a.eqp_mandante_id = b.id )
@@ -300,7 +303,8 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 			select 	ROW_NUMBER() OVER (ORDER BY result.qtd desc, result.nome) as ordem,
 					result.*
 			from (
-				select 	b.nome,
+				select 	b.id,
+						b.nome,
 						count(1) as qtd
 				from jogo as a
 						join equipe as b on ( a.eqp_visitante_id = b.id )
