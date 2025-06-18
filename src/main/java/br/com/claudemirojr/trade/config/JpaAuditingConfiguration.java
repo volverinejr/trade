@@ -14,6 +14,7 @@ public class JpaAuditingConfiguration {
 
 	@Bean
 	AuditorAware<String> auditorProvider() {
-		return () -> Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication().getName());
+		return () -> Optional.ofNullable("test-user"
+		);
 	}
 }
