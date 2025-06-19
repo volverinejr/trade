@@ -28,13 +28,16 @@ class EquipeServiceTest extends MySQLTestContainer {
 
 	@Test
 	void inserirEquipe() {
+		String nome = "Tottenham";
 		Equipe equipe = new Equipe();
-		equipe.setNome("Tottenham");
-
+		
+		equipe.setNome(nome);
 		equipeRepository.save(equipe);
-		List<Equipe> todos = equipeRepository.findAll();
-		System.out.println("### Equipes no banco: " + todos);
-		assertEquals(1, todos.size());
-		assertEquals("Tottenham", todos.get(0).getNome());
+		
+		List<Equipe> equipes = equipeRepository.findAll();
+
+		assertEquals(1, equipes.size());
+		
+		assertEquals(nome, equipes.get(0).getNome());
 	}
 }
