@@ -13,7 +13,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
 public class CacheConfig {
 
 	@Bean
-	public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
+	RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
 		return (builder) -> builder
 				.withCacheConfiguration("trade_campeonatoCache",
 						RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(3)))
@@ -32,7 +32,7 @@ public class CacheConfig {
 	}
 
 	@Bean
-	public RedisCacheConfiguration cacheConfiguration() {
+	RedisCacheConfiguration cacheConfiguration() {
 		return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(60)).disableCachingNullValues()
 				.serializeValuesWith(SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 	}
