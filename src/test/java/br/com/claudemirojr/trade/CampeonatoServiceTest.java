@@ -21,6 +21,7 @@ public class CampeonatoServiceTest extends MySQLTestContainer {
 
     @Autowired
     private CampeonatoRepository campeonatoRepository;
+    
 
     @BeforeEach
     void limparBds() {
@@ -29,15 +30,18 @@ public class CampeonatoServiceTest extends MySQLTestContainer {
 
     @Test
     void inserirCampeonato() {
+    	String nome = "Premier League 2023/24"; 
         Campeonato campeonato = new Campeonato();
-        campeonato.setNome("Premier League 2023/24");
+        
+        campeonato.setNome(nome);
         campeonato.setDescricao("Principal competição de pontos corridos da Inglaterra");
         campeonato.setAtivo(true);
-
         campeonatoRepository.save(campeonato);
-        List<Campeonato> todos = campeonatoRepository.findAll();
-        System.out.println("### Campeonatos no banco: " + todos);
-        assertEquals(1, todos.size());
-        assertEquals("Premier League 2023/24", todos.get(0).getNome());
+        
+        List<Campeonato> campeonatos = campeonatoRepository.findAll();
+        
+        assertEquals(1, campeonatos.size());
+        
+        assertEquals(nome, campeonatos.get(0).getNome());
     }
 }

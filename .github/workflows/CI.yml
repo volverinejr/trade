@@ -6,6 +6,9 @@ on:
 
 env:
   IMAGEM_NAME: trade
+  TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+  TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+
 
 jobs:
   build:
