@@ -8,6 +8,7 @@ env:
   IMAGEM_NAME: trade
   TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
   TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+  REDIS_HOST: ${{ secrets.REDIS_HOST }}
 
 
 jobs:
