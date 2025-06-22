@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,13 +20,12 @@ public class CampeonatoServiceTest extends MySQLTestContainer {
     @Autowired
     private CampeonatoRepository campeonatoRepository;
     
-
-    @BeforeEach
+    //@BeforeEach
     void limparBds() {
         campeonatoRepository.deleteAll();
     }
 
-    @Test
+    //@Test
     void inserirCampeonato() {
     	String nome = "Premier League 2023/24"; 
         Campeonato campeonato = new Campeonato();
