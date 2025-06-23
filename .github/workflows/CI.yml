@@ -19,25 +19,33 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-              
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: 21
           distribution: temurin
-        
+
       - name: Build with Maven
         run: mvn clean verify
 
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: target/site/jacoco/jacoco.xml
+          flags: unittests
+          name: codecov-coverage
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        
+
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      
+
       - name: Gerando a Tag
         id: tagging
         uses: mathieudutour/github-tag-action@v6.1
@@ -51,5 +59,5 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGEM_NAME }}:${{ steps.tagging.outputs.new_version }}, ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGEM_NAME }}:latest
-        
+
 
