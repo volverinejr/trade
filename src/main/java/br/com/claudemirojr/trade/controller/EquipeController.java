@@ -98,7 +98,7 @@ public class EquipeController {
 
 	@Operation(summary = "Busca todas as equipes ordenadas pelo nome")
 	@GetMapping("/search-all")
-	public ResponseEntity<?> carregarCampeonatosAtivos() {
+	public ResponseEntity<?> carregarTodasAsEquipes() {
 		List<EquipeResponseDto> registros = equipeService.findAllOrderNome();
 
 		return ResponseEntity.ok(registros);
@@ -106,7 +106,7 @@ public class EquipeController {
 	
 	
 	@GetMapping("/filter/{valor}")
-	public ResponseEntity<?> findAllFilter(@PathVariable("valor") String valor, Pageable pageable) {
+	public ResponseEntity<?> filterAllPorIdOrNome(@PathVariable("valor") String valor, Pageable pageable) {
 		Page<EquipeResponseDto> registros = equipeService.findAllPorIdOrNome(valor, pageable);
 
 		return ResponseEntity.ok(registros);

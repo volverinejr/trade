@@ -19,14 +19,14 @@ import org.springframework.context.annotation.Description;
 import br.com.claudemirojr.trade.dto.EquipeDto;
 import br.com.claudemirojr.trade.dto.EquipeResponseDto;
 import br.com.claudemirojr.trade.model.repository.EquipeRepository;
-import br.com.claudemirojr.trade.testcontainer.AplicacaoTestContainer;
+import br.com.claudemirojr.trade.testcontainer.AplicacaoStartTestContainer;
 import br.com.claudemirojr.trade.util.AuthUtil;
 import io.restassured.RestAssured;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class EquipeControllerTest extends AplicacaoTestContainer {
+class EquipeControllerTest extends AplicacaoStartTestContainer {
 
 	@Autowired
 	private EquipeRepository equipeRepository;
@@ -125,12 +125,35 @@ class EquipeControllerTest extends AplicacaoTestContainer {
                 .as(EquipeResponseDto.class);
 		
 		assertEquals(equipeModificada, equipeResponseDto.getNome());
-	}	
+	}
+	
 	
 	
 	
 	@Test
 	@Order(4)
+	@Description("Atualizar o nome da equipe para Bahia Campeão")
+	void updateregistroInexistente() {
+		String equipeModificada = "Bahia Campeão";
+		
+		EquipeDto equipeDto = new EquipeDto();
+		equipeDto.setNome(equipeModificada);
+
+		RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .body(equipeDto)
+                .when()
+                .put("/equipe/v1/10")
+                .then()
+                .statusCode(404);
+	}	
+	
+	
+	
+	
+	@Test
+	@Order(5)
 	@Description("Listar todas as equipes")
 	void findAll() {
 		String nome = "Man City";
@@ -161,11 +184,34 @@ class EquipeControllerTest extends AplicacaoTestContainer {
                 .getList("content", EquipeResponseDto.class);   
 		
 		assertEquals(2, equipeResponseDto.size());
+	}
+	
+	
+	
+	
+	
+	@Test
+	@Order(6)
+	@Description("Listar todas as equipes cujo ID >= 2")
+	void findAllIdMaiorIgual() {
+		//listando todas as equipes
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/search-id-maior-igual/" + 2)
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);   
+		
+		assertEquals(1, equipeResponseDto.size());
 	}		
 	
 	
 	@Test
-	@Order(5)
+	@Order(7)
 	@Description("Listar a equipe pelo nome")
 	void findAllNomeContem() {
 		String equipeModificada = "Bahia Campeão";
@@ -190,7 +236,65 @@ class EquipeControllerTest extends AplicacaoTestContainer {
 	
 	
 	@Test
-	@Order(6)
+	@Order(8)
+	@Description("Listar todas as equipe")
+	void carregarTodasAsEquipes() {
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/search-all")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);   
+		
+		assertEquals(2, equipeResponseDto.size());
+	}
+	
+	
+	
+	
+		
+	
+	@Test
+	@Order(9)
+	@Description("Filtar as equipes por ID ou Nome")
+	void filterAllPorIdOrNome() {
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/filter/" + 1)
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);   
+		
+		assertEquals(2, equipeResponseDto.size());
+		
+		
+		
+		equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/filter/Bahia")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);   
+		
+		assertEquals(1, equipeResponseDto.size());
+		
+	}
+		
+	
+	@Test
+	@Order(10)
 	@Description("Excluir a Equipe id=1")
 	void delete() {
 		//Excluir o registro id=1
@@ -211,7 +315,24 @@ class EquipeControllerTest extends AplicacaoTestContainer {
                 .then()
                 .statusCode(404);
 		
+	}
+	
+	
+	@Test
+	@Order(11)
+	@Description("Excluir a Equipe id=10 que não existe")
+	void deleteRegistroInecistente() {
+		//Excluir o registro id=10
+		RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .delete("/equipe/v1/10")
+                .then()
+                .statusCode(404);
 	}		
+	
+	
 	
 	
 	
