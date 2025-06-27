@@ -73,6 +73,8 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
                 .jsonPath()
                 .getLong("id");
 		
+
+		System.out.println("ID do Campeonato gerado: " + campeonatoId);
 		assertNotNull(campeonatoId);
 	}
 	

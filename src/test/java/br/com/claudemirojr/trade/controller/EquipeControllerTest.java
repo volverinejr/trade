@@ -34,6 +34,7 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
 	private String accessToken;
 	private Long equipeId;
 	
+	
 	@LocalServerPort
 	private int port;	
 	
@@ -69,8 +70,11 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
                 .extract()
                 .jsonPath()
                 .getLong("id");
+	
 		
+		System.out.println("ID da Equipe gerada: " + equipeId);
 		assertNotNull(equipeId);
+		
 	}
 	
 	
