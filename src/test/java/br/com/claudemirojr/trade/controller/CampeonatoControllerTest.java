@@ -16,9 +16,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Description;
 
-import br.com.claudemirojr.trade.dto.EquipeDto;
-import br.com.claudemirojr.trade.dto.EquipeResponseDto;
-import br.com.claudemirojr.trade.model.repository.EquipeRepository;
+import br.com.claudemirojr.trade.dto.CampeonatoDto;
+import br.com.claudemirojr.trade.dto.CampeonatoResponseDto;
+import br.com.claudemirojr.trade.model.repository.CampeonatoRepository;
 import br.com.claudemirojr.trade.testcontainer.AplicacaoStartTestContainer;
 import br.com.claudemirojr.trade.util.AuthUtil;
 import io.restassured.RestAssured;
@@ -26,13 +26,13 @@ import io.restassured.RestAssured;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class EquipeControllerTest extends AplicacaoStartTestContainer {
-
+class CampeonatoControllerTest extends AplicacaoStartTestContainer {
+	
 	@Autowired
-	private EquipeRepository equipeRepository;
+	private CampeonatoRepository campeonatoRepository;
 
 	private String accessToken;
-	private Long equipeId;
+	private Long campeonatoId;
 	
 	@LocalServerPort
 	private int port;	
@@ -40,269 +40,267 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
 
 	@BeforeAll
 	void obterToken() {
-		equipeRepository.deleteAll();
+		campeonatoRepository.deleteAll();
 
 		accessToken = AuthUtil.obterToken();
 		
 		RestAssured.port = port;
 		RestAssured.basePath = "/api/trade";
 	}
-
-
+	
 	@Test
 	@Order(1)
-	@Description("Criar uma nova equipe chamada Bahia")
+	@Description("Criar um novo campeonato chamado Premier League 2023/2023")
 	void create() {
-		String nome = "Bahia";
+		String nome = "Premier League 2023/2023";
+		String descricao = "Principal competição de pontos corridos da Inglaterra";
+		Boolean ativo = true;
 
-		EquipeDto equipeDto = new EquipeDto();
-		equipeDto.setNome(nome);
+		CampeonatoDto campeonatoDto = new CampeonatoDto();
+		campeonatoDto.setNome(nome);
+		campeonatoDto.setDescricao(descricao);
+		campeonatoDto.setAtivo(ativo);
 		
-		equipeId = RestAssured.given()
+		campeonatoId = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
-                .body(equipeDto)
+                .body(campeonatoDto)
                 .when()
-                .post("/equipe/v1")
+                .post("/campeonato/v1")
                 .then()
                 .statusCode(201)
                 .extract()
                 .jsonPath()
                 .getLong("id");
 		
-		assertNotNull(equipeId);
+		assertNotNull(campeonatoId);
 	}
-	
 	
 	@Test
 	@Order(2)
-	@Description("Buscar equipe criada por ID e validar nome")
+	@Description("Buscar campeonato criado por ID e validar nome")
 	void findByAuditId() {
-		String equipeEsperada = "Bahia";
+		String campeonatoEsperado = "Premier League 2023/2023";
 
-		EquipeResponseDto equipeResponseDto = RestAssured.given()
+		CampeonatoResponseDto campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .get("/equipe/v1/" + equipeId)
+                .get("/campeonato/v1/" + campeonatoId)
                 .then()
                 .statusCode(200)
                 .extract()
-                .as(EquipeResponseDto.class);
+                .as(CampeonatoResponseDto.class);
 		
-		assertEquals(equipeEsperada, equipeResponseDto.getNome());
+		assertEquals(campeonatoEsperado, campeonatoResponseDto.getNome());
 	}
 	
 	
 	@Test
 	@Order(3)
-	@Description("Atualizar o nome da equipe para Bahia Campeão")
+	@Description("Atualizar o nome do campeonato para Brasileirão")
 	void update() {
-		String equipeModificada = "Bahia Campeão";
+		String campeonatoModificado = "Brasileirão";
+		String descricao = "Principal competição de pontos corridos do Brasil";
+		Boolean ativo = true;
 		
-		EquipeDto equipeDto = new EquipeDto();
-		equipeDto.setNome(equipeModificada);
+		CampeonatoDto campeonatoDto = new CampeonatoDto();
+		campeonatoDto.setNome(campeonatoModificado);
+		campeonatoDto.setDescricao(descricao);
+		campeonatoDto.setAtivo(ativo);
 
 		RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
-                .body(equipeDto)
+                .body(campeonatoDto)
                 .when()
-                .put("/equipe/v1/" + equipeId)
+                .put("/campeonato/v1/" + campeonatoId)
                 .then()
                 .statusCode(200);
 		
 		
 		//Confirmar que foi alterado
-		EquipeResponseDto equipeResponseDto = RestAssured.given()
+		CampeonatoResponseDto campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .get("/equipe/v1/" + equipeId)
+                .get("/campeonato/v1/" + campeonatoId)
                 .then()
                 .statusCode(200)
                 .extract()
-                .as(EquipeResponseDto.class);
+                .as(CampeonatoResponseDto.class);
 		
-		assertEquals(equipeModificada, equipeResponseDto.getNome());
+		assertEquals(campeonatoModificado, campeonatoResponseDto.getNome());
 	}
-	
-	
-	
 	
 	@Test
 	@Order(4)
-	@Description("Atualizar o nome da equipe para Bahia Campeão")
+	@Description("Atualizar o nome do campeonato para Brasileirão")
 	void updateregistroInexistente() {
-		String equipeModificada = "Bahia Campeão";
+		String campeonatoModificado = "Brasileirão";
+		String descricao = "Principal competição de pontos corridos do Brasil";
+		Boolean ativo = true;
 		
-		EquipeDto equipeDto = new EquipeDto();
-		equipeDto.setNome(equipeModificada);
+		CampeonatoDto campeonatoDto = new CampeonatoDto();
+		campeonatoDto.setNome(campeonatoModificado);
+		campeonatoDto.setDescricao(descricao);
+		campeonatoDto.setAtivo(ativo);
 
 		RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
-                .body(equipeDto)
+                .body(campeonatoDto)
                 .when()
-                .put("/equipe/v1/10")
+                .put("/campeonato/v1/10")
                 .then()
                 .statusCode(404);
 	}	
 	
 	
-	
-	
 	@Test
 	@Order(5)
-	@Description("Listar todas as equipes")
+	@Description("Listar todos os campeonatos")
 	void findAll() {
-		String nome = "Man City";
+		String campeonatoModificado = "Série B";
+		String descricao = "Principal competição de pontos corridos do Brasil";
+		Boolean ativo = true;
 
-		EquipeDto equipeDto = new EquipeDto();
-		equipeDto.setNome(nome);
+		CampeonatoDto campeonatoDto = new CampeonatoDto();
+		campeonatoDto.setNome(campeonatoModificado);
+		campeonatoDto.setDescricao(descricao);
+		campeonatoDto.setAtivo(ativo);
 
 		//inserindo mais um registro no banco
 		RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
-                .body(equipeDto)
+                .body(campeonatoDto)
                 .when()
-                .post("/equipe/v1")
+                .post("/campeonato/v1")
                 .then()
                 .statusCode(201);
 
 		//listando todas as equipes
-		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .get("/equipe/v1")
+                .get("/campeonato/v1")
                 .then()
                 .statusCode(200)
                 .extract()
                 .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
+                .getList("content", CampeonatoResponseDto.class);   
 		
-		assertEquals(2, equipeResponseDto.size());
+		assertEquals(2, campeonatoResponseDto.size());
 	}
-	
-	
-	
 	
 	
 	@Test
 	@Order(6)
-	@Description("Listar todas as equipes cujo ID >= 2")
+	@Description("Listar todos os campeonatos cujo ID >= 2")
 	void findAllIdMaiorIgual() {
-		//listando todas as equipes
-		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+		//listando todos os campeonatos
+		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .get("/equipe/v1/search-id-maior-igual/" + 2)
+                .get("/campeonato/v1/search-id-maior-igual/" + 2)
                 .then()
                 .statusCode(200)
                 .extract()
                 .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
+                .getList("content", CampeonatoResponseDto.class);   
 		
-		assertEquals(1, equipeResponseDto.size());
-	}		
+		assertEquals(1, campeonatoResponseDto.size());
+	}
 	
 	
 	@Test
 	@Order(7)
-	@Description("Listar a equipe pelo nome")
+	@Description("Listar o campeonato pelo nome")
 	void findAllNomeContem() {
-		String equipeModificada = "Bahia Campeão";
+		String campeonatoModificado = "Série B";
 		
-		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .get("/equipe/v1/search-nome/" + equipeModificada)
+                .get("/campeonato/v1/search-nome/" + campeonatoModificado)
                 .then()
                 .statusCode(200)
                 .extract()
                 //.as(new TypeRef<List<EquipeResponseDto>>() {});
                 .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
+                .getList("content", CampeonatoResponseDto.class);   
 		
-		assertEquals(1, equipeResponseDto.size());
+		assertEquals(1, campeonatoResponseDto.size());
 	}
-	
-
-	
 	
 	
 	@Test
 	@Order(8)
-	@Description("Listar todas as equipe")
-	void carregarTodasAsEquipes() {
-		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+	@Description("Listar todos os campeonatos ativos")
+	void carregarTodosOsCampeonatosAtivos() {
+		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .get("/equipe/v1/search-all")
+                .get("/campeonato/v1/search-ativo")
                 .then()
                 .statusCode(200)
                 .extract()
                 .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
+                .getList("content", CampeonatoResponseDto.class);   
 		
-		assertEquals(2, equipeResponseDto.size());
+		assertEquals(2, campeonatoResponseDto.size());
 	}
 	
-	
-	
-	
-		
 	
 	@Test
 	@Order(9)
-	@Description("Filtar as equipes por ID ou Nome")
+	@Description("Filtar todos os campeonatos por ID ou Nome")
 	void filterAllPorIdOrNome() {
-		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .get("/equipe/v1/filter/" + 1)
+                .get("/campeonato/v1/filter/" + 1)
                 .then()
                 .statusCode(200)
                 .extract()
                 .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
+                .getList("content", CampeonatoResponseDto.class);   
 		
-		assertEquals(2, equipeResponseDto.size());
+		assertEquals(2, campeonatoResponseDto.size());
 		
 		
 		
-		equipeResponseDto = RestAssured.given()
+		campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .get("/equipe/v1/filter/Bahia")
+                .get("/campeonato/v1/filter/Série B")
                 .then()
                 .statusCode(200)
                 .extract()
                 .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
+                .getList("content", CampeonatoResponseDto.class);   
 		
-		assertEquals(1, equipeResponseDto.size());
+		assertEquals(1, campeonatoResponseDto.size());
 		
 	}
-		
 	
 	@Test
 	@Order(10)
-	@Description("Excluir a Equipe id=1")
+	@Description("Excluir o Campeonato id=1")
 	void delete() {
 		//Excluir o registro id=1
 		RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .delete("/equipe/v1/" + equipeId)
+                .delete("/campeonato/v1/" + campeonatoId)
                 .then()
                 .statusCode(200);
 		
@@ -311,7 +309,7 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .get("/equipe/v1/" + equipeId)
+                .get("/campeonato/v1/" + campeonatoId)
                 .then()
                 .statusCode(404);
 		
@@ -320,20 +318,18 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
 	
 	@Test
 	@Order(11)
-	@Description("Excluir a Equipe id=10 que não existe")
+	@Description("Excluir campeonato id=10 que não existe")
 	void deleteRegistroInexistente() {
 		//Excluir o registro id=10
 		RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .delete("/equipe/v1/10")
+                .delete("/campeonato/v1/10")
                 .then()
                 .statusCode(404);
-	}		
+	}
+		
 	
-	
-	
-	
-	
+
 }
