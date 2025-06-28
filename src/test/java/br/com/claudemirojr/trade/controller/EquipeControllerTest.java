@@ -22,6 +22,7 @@ import br.com.claudemirojr.trade.model.repository.EquipeRepository;
 import br.com.claudemirojr.trade.testcontainer.AplicacaoStartTestContainer;
 import br.com.claudemirojr.trade.util.AuthUtil;
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -90,19 +91,11 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
 	@Order(4)
 	@Description("Atualizar equipe inexistente")
 	void updateregistroInexistente() {
-		String equipeModificada = "Bahia Campeão";
-
-		EquipeDto equipeDto = new EquipeDto();
-		equipeDto.setNome(equipeModificada);
-
-		RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .body(equipeDto)
-                .when()
-                .put("/equipe/v1/10")
-                .then()
-                .statusCode(404);
+		String equipeModificada = "Vitória Campeão - :-)";
+		
+		int statusCode = atualizarEquipeInexistente(10L, equipeModificada);
+		
+		assertEquals(404, statusCode);
 	}
 
 
@@ -170,14 +163,9 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
 		excluirEquipe(equipeId);
 
 		//Confirmar se o registro foi excluido
-		RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/equipe/v1/" + equipeId)
-                .then()
-                .statusCode(404);
-
+		int statusCode = equipeInexistente(equipeId);
+		
+		assertEquals(404, statusCode);
 	}
 
 
@@ -185,14 +173,9 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
 	@Order(11)
 	@Description("Excluir a Equipe id=10 que não existe")
 	void deleteRegistroInexistente() {
-		//Excluir o registro id=10
-		RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .delete("/equipe/v1/10")
-                .then()
-                .statusCode(404);
+		int statusCode = equipeInexistente(10L);
+		
+		assertEquals(404, statusCode);
 	}
 
 
@@ -247,7 +230,24 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
                 .then()
                 .statusCode(200);
 	}
+	
+	
+	private int atualizarEquipeInexistente(Long id, String nome) {
+		EquipeDto equipeDto = new EquipeDto();
+		equipeDto.setNome(nome);
 
+		Response response = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .body(equipeDto)
+                .when()
+                .put("/equipe/v1/" + id);
+		
+		int statusCode = response.getStatusCode();
+		
+		return statusCode;
+	}	
+	
 
 	private List<EquipeResponseDto> listarTodasAsEquipes() {
 		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
@@ -354,6 +354,18 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
                 .delete("/equipe/v1/" + id)
                 .then()
                 .statusCode(200);
+	}
+	
+	private int equipeInexistente(Long id) {
+		Response response =  RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/" + id);
+		
+		int statusCode = response.getStatusCode();
+		
+		return statusCode;
 	}
 
 
