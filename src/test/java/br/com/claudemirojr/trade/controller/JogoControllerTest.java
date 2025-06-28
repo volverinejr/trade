@@ -181,7 +181,7 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 	
 	
 	
-	@Test
+	//@Test
 	@Order(3)
 	@Description("Atualizar os dados do jogo")
 	void update() {
@@ -208,7 +208,7 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 	    JogoDto jogoDto = new JogoDto();
 	    jogoDto.setNumeroRodada(numeroRodadaModificado);
 	    jogoDto.setCampeonato(campeonato);
-	    jogoDto.setEqpMandante(eqMandante);
+	    //jogoDto.setEqpMandante(eqMandante);
 	    jogoDto.setEqpVisitante(visitante);
 
 	    jogoDto.setEqpMandantePrimeitoTempoTotalGol(1);

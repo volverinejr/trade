@@ -33,18 +33,18 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
 
 	private String accessToken;
 	private Long equipeId;
-	
-	
+
+
 	@LocalServerPort
-	private int port;	
-	
+	private int port;
+
 
 	@BeforeAll
 	void obterToken() {
 		equipeRepository.deleteAll();
 
 		accessToken = AuthUtil.obterToken();
-		
+
 		RestAssured.port = port;
 		RestAssured.basePath = "/api/trade";
 	}
@@ -54,92 +54,44 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
 	@Order(1)
 	@Description("Criar uma nova equipe chamada Bahia")
 	void create() {
-		String nome = "Bahia";
+		equipeId = criarEquipe("Bahia");
 
-		EquipeDto equipeDto = new EquipeDto();
-		equipeDto.setNome(nome);
-		
-		equipeId = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .body(equipeDto)
-                .when()
-                .post("/equipe/v1")
-                .then()
-                .statusCode(201)
-                .extract()
-                .jsonPath()
-                .getLong("id");
-	
-		
-		System.out.println("ID da Equipe gerada: " + equipeId);
 		assertNotNull(equipeId);
-		
 	}
-	
-	
+
+
 	@Test
 	@Order(2)
 	@Description("Buscar equipe criada por ID e validar nome")
 	void findByAuditId() {
 		String equipeEsperada = "Bahia";
 
-		EquipeResponseDto equipeResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/equipe/v1/" + equipeId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .as(EquipeResponseDto.class);
-		
+		EquipeResponseDto equipeResponseDto = buscarEquipe(equipeId);
+
 		assertEquals(equipeEsperada, equipeResponseDto.getNome());
 	}
-	
-	
+
+
 	@Test
 	@Order(3)
 	@Description("Atualizar o nome da equipe para Bahia Campeão")
 	void update() {
 		String equipeModificada = "Bahia Campeão";
-		
-		EquipeDto equipeDto = new EquipeDto();
-		equipeDto.setNome(equipeModificada);
+		atualizarEquipe(equipeId, equipeModificada);
 
-		RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .body(equipeDto)
-                .when()
-                .put("/equipe/v1/" + equipeId)
-                .then()
-                .statusCode(200);
-		
-		
 		//Confirmar que foi alterado
-		EquipeResponseDto equipeResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/equipe/v1/" + equipeId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .as(EquipeResponseDto.class);
-		
+		EquipeResponseDto equipeResponseDto = buscarEquipe(equipeId);
+
 		assertEquals(equipeModificada, equipeResponseDto.getNome());
 	}
-	
-	
-	
-	
+
+
 	@Test
 	@Order(4)
-	@Description("Atualizar o nome da equipe para Bahia Campeão")
+	@Description("Atualizar equipe inexistente")
 	void updateregistroInexistente() {
 		String equipeModificada = "Bahia Campeão";
-		
+
 		EquipeDto equipeDto = new EquipeDto();
 		equipeDto.setNome(equipeModificada);
 
@@ -151,165 +103,72 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
                 .put("/equipe/v1/10")
                 .then()
                 .statusCode(404);
-	}	
-	
-	
-	
-	
+	}
+
+
 	@Test
 	@Order(5)
-	@Description("Listar todas as equipes")
+	@Description("Listar todas as equipes - com paginação")
 	void findAll() {
 		String nome = "Man City";
+		criarEquipe(nome);
 
-		EquipeDto equipeDto = new EquipeDto();
-		equipeDto.setNome(nome);
+		List<EquipeResponseDto> equipeResponseDto = listarTodasAsEquipes();
 
-		//inserindo mais um registro no banco
-		RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .body(equipeDto)
-                .when()
-                .post("/equipe/v1")
-                .then()
-                .statusCode(201);
-
-		//listando todas as equipes
-		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/equipe/v1")
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
-		
 		assertEquals(2, equipeResponseDto.size());
 	}
-	
-	
-	
-	
-	
+
+
 	@Test
 	@Order(6)
 	@Description("Listar todas as equipes cujo ID >= 2")
 	void findAllIdMaiorIgual() {
-		//listando todas as equipes
-		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/equipe/v1/search-id-maior-igual/" + 2)
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
-		
+		List<EquipeResponseDto> equipeResponseDto = listarTodasAsEquipesIdMaiorOuIgual(2L);
+
 		assertEquals(1, equipeResponseDto.size());
-	}		
-	
-	
+	}
+
+
 	@Test
 	@Order(7)
 	@Description("Listar a equipe pelo nome")
 	void findAllNomeContem() {
 		String equipeModificada = "Bahia Campeão";
-		
-		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/equipe/v1/search-nome/" + equipeModificada)
-                .then()
-                .statusCode(200)
-                .extract()
-                //.as(new TypeRef<List<EquipeResponseDto>>() {});
-                .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
-		
+
+		List<EquipeResponseDto> equipeResponseDto = listarTodasAsEquipesContemNome(equipeModificada);
+
 		assertEquals(1, equipeResponseDto.size());
 	}
-	
 
-	
-	
-	
+
 	@Test
 	@Order(8)
-	@Description("Listar todas as equipe")
+	@Description("Listar todas as equipe - sem paginação")
 	void carregarTodasAsEquipes() {
-		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/equipe/v1/search-all")
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
-		
+		List<EquipeResponseDto> equipeResponseDto = listarTodasAsEquipesSemPaginacao();
+
 		assertEquals(2, equipeResponseDto.size());
 	}
-	
-	
-	
-	
-		
-	
+
+
 	@Test
 	@Order(9)
 	@Description("Filtar as equipes por ID ou Nome")
 	void filterAllPorIdOrNome() {
-		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/equipe/v1/filter/" + 1)
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
-		
+		List<EquipeResponseDto> equipeResponseDto = filtroPorIdMaiorOuIgual(1L);
 		assertEquals(2, equipeResponseDto.size());
-		
-		
-		
-		equipeResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/equipe/v1/filter/Bahia")
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
-		
+
+		equipeResponseDto = filtroPorNome("Bahia");
 		assertEquals(1, equipeResponseDto.size());
-		
 	}
-		
-	
+
+
 	@Test
 	@Order(10)
 	@Description("Excluir a Equipe id=1")
 	void delete() {
-		//Excluir o registro id=1
-		RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .delete("/equipe/v1/" + equipeId)
-                .then()
-                .statusCode(200);
-		
+		excluirEquipe(equipeId);
+
 		//Confirmar se o registro foi excluido
 		RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
@@ -318,10 +177,10 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
                 .get("/equipe/v1/" + equipeId)
                 .then()
                 .statusCode(404);
-		
+
 	}
-	
-	
+
+
 	@Test
 	@Order(11)
 	@Description("Excluir a Equipe id=10 que não existe")
@@ -334,10 +193,168 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
                 .delete("/equipe/v1/10")
                 .then()
                 .statusCode(404);
-	}		
-	
-	
-	
-	
-	
+	}
+
+
+
+
+	private Long criarEquipe(String nome) {
+		EquipeDto equipeDto = new EquipeDto();
+		equipeDto.setNome(nome);
+
+		equipeId = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .body(equipeDto)
+                .when()
+                .post("/equipe/v1")
+                .then()
+                .statusCode(201)
+                .extract()
+                .jsonPath()
+                .getLong("id");
+
+		return equipeId;
+	}
+
+
+	private EquipeResponseDto buscarEquipe(Long id) {
+		EquipeResponseDto equipeResponseDto = RestAssured.given()
+				.header("Authorization", "Bearer " + accessToken)
+			    .contentType("application/json")
+			    .when()
+			    .get("/equipe/v1/" + id)
+			    .then()
+			    .statusCode(200)
+			    .extract()
+			    .as(EquipeResponseDto.class);
+
+
+		return equipeResponseDto;
+	}
+
+
+	private void atualizarEquipe(Long id, String nome) {
+		EquipeDto equipeDto = new EquipeDto();
+		equipeDto.setNome(nome);
+
+		RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .body(equipeDto)
+                .when()
+                .put("/equipe/v1/" + equipeId)
+                .then()
+                .statusCode(200);
+	}
+
+
+	private List<EquipeResponseDto> listarTodasAsEquipes() {
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);
+
+		return equipeResponseDto;
+	}
+
+
+	private List<EquipeResponseDto> listarTodasAsEquipesSemPaginacao() {
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/search-all")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);
+
+		return equipeResponseDto;
+	}
+
+
+	private List<EquipeResponseDto> listarTodasAsEquipesIdMaiorOuIgual(Long id) {
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/search-id-maior-igual/" + id)
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);
+
+		return equipeResponseDto;
+	}
+
+
+	private List<EquipeResponseDto> listarTodasAsEquipesContemNome(String nome) {
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/search-nome/" + nome)
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);
+
+		return equipeResponseDto;
+
+	}
+
+
+	private List<EquipeResponseDto> filtroPorIdMaiorOuIgual(Long id) {
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/filter/" + id)
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);
+
+		return equipeResponseDto;
+	}
+
+
+	private List<EquipeResponseDto> filtroPorNome(String nome) {
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/filter/" + nome)
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);
+
+		return equipeResponseDto;
+	}
+
+
+	private void excluirEquipe(Long id) {
+		RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .delete("/equipe/v1/" + id)
+                .then()
+                .statusCode(200);
+	}
+
+
 }
