@@ -23,55 +23,261 @@ import br.com.claudemirojr.trade.dto.JogoDto;
 import br.com.claudemirojr.trade.dto.JogoResponseDto;
 import br.com.claudemirojr.trade.model.entity.Campeonato;
 import br.com.claudemirojr.trade.model.entity.Equipe;
+import br.com.claudemirojr.trade.model.repository.CampeonatoRepository;
+import br.com.claudemirojr.trade.model.repository.EquipeRepository;
 import br.com.claudemirojr.trade.model.repository.JogoRepository;
 import br.com.claudemirojr.trade.testcontainer.AplicacaoStartTestContainer;
 import br.com.claudemirojr.trade.util.AuthUtil;
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class JogoControllerTest extends AplicacaoStartTestContainer {
+
+	
+	@Autowired
+	private EquipeRepository equipeRepository;
+
 	@Autowired
 	private JogoRepository jogoRepository;
-
+	
+	@Autowired
+	private CampeonatoRepository campeonatoRepository;
+	
 	private String accessToken;
 	private Long jogoId;
-    static String campeonato;
-    private String equipeMandante;
-    private String equipeVisitante;
-	
-	
+	private Campeonato campeonato;
+	private Equipe mandante;
+	private Equipe visitante;
+
+
 	@LocalServerPort
-	private int port;	
-	
+	private int port;
+
 
 	@BeforeAll
 	void obterToken() {
+		campeonatoRepository.deleteAll();
+		
+		equipeRepository.deleteAll();
+		
 		jogoRepository.deleteAll();
 
 		accessToken = AuthUtil.obterToken();
-		
+
 		RestAssured.port = port;
 		RestAssured.basePath = "/api/trade";
-	} 
-	
+	}
+
+
 	@Test
 	@Order(1)
 	@Description("Criar um novo jogo")
 	void create() {
-		//criando o campeonato
-		String nome = "Brasileirão série A 2023";
-		String descricao = "Principal competição de pontos corridos do Brasil.";
-		Boolean ativo = true;
+		var campeonatoId = criarCampeonato("Brasileirão série A 2025");
+		CampeonatoResponseDto campeonatoResponse = buscarCampeonato(campeonatoId);
+		assertNotNull(campeonatoResponse);
+		campeonato = ModelMaperConverter.parseObject(campeonatoResponse, Campeonato.class);
+
+		Integer numeroRodada = 1;
+
+		var equipeId = criarEquipe("Bahia");
+		EquipeResponseDto eqpMandante = buscarEquipe(equipeId);
+		assertNotNull(eqpMandante);
+		mandante = ModelMaperConverter.parseObject(eqpMandante, Equipe.class);
+
+		Integer eqpMandantePrimeitoTempoTotalGol = 0;
+		Integer eqpMandantePrimeitoTempoTotalEscanteio = 0;
+		Integer eqpMandanteSegundoTempoTotalGol = 0;
+		Integer eqpMandanteSegundoTempoTotalEscanteio = 0;
+
+
+
+		equipeId = criarEquipe("Vicetoria");
+		EquipeResponseDto eqpVisitante = buscarEquipe(equipeId);
+		assertNotNull(eqpVisitante);
+		visitante = ModelMaperConverter.parseObject(eqpVisitante, Equipe.class);
+
+		Integer eqpVisitantePrimeitoTempoTotalGol = 0;
+		Integer eqpVisitantePrimeitoTempoTotalEscanteio = 0;
+		Integer eqpVisitanteSegundoTempoTotalGol = 0;
+		Integer eqpVisitanteSegundoTempoTotalEscanteio = 0;
+
+
+		jogoId = criarJogo(campeonato, numeroRodada,
+				mandante,
+				eqpMandantePrimeitoTempoTotalGol,
+				eqpMandantePrimeitoTempoTotalEscanteio,
+				eqpMandanteSegundoTempoTotalGol,
+				eqpMandanteSegundoTempoTotalEscanteio,
+
+				visitante,
+				eqpVisitantePrimeitoTempoTotalGol,
+				eqpVisitantePrimeitoTempoTotalEscanteio,
+				eqpVisitanteSegundoTempoTotalGol,
+				eqpVisitanteSegundoTempoTotalEscanteio
+				);
+
+		assertNotNull(jogoId);
+	}
+
+
+	@Test
+	@Order(2)
+	@Description("Buscar jogo criado por ID e validar: Campeonato, Mandante, Visitante")
+	void findByAuditId() {
+		JogoResponseDto jogo = buscarJogo(jogoId);
+
+
+		assertEquals(campeonato,  jogo.getCampeonato() );
+		assertEquals(mandante,  jogo.getEqpMandante() );
+		assertEquals(visitante,  jogo.getEqpVisitante() );
+	}
+
+
+	@Test
+	@Order(3)
+	@Description("Atualizar os dados do jogo")
+	void update() {
+		Integer numeroRodada = 1;
+
+		var equipeId = criarEquipe("Fortaleza");
+		EquipeResponseDto eqpMandante = buscarEquipe(equipeId);
+		assertNotNull(eqpMandante);
+		mandante = ModelMaperConverter.parseObject(eqpMandante, Equipe.class);
+
+		Integer eqpMandantePrimeitoTempoTotalGol = 1;
+		Integer eqpMandantePrimeitoTempoTotalEscanteio = 1;
+		Integer eqpMandanteSegundoTempoTotalGol = 1;
+		Integer eqpMandanteSegundoTempoTotalEscanteio = 1;
+
+
+
+		equipeId = criarEquipe("Ceará");
+		EquipeResponseDto eqpVisitante = buscarEquipe(equipeId);
+		assertNotNull(eqpVisitante);
+		visitante = ModelMaperConverter.parseObject(eqpVisitante, Equipe.class);
+
+		Integer eqpVisitantePrimeitoTempoTotalGol = 2;
+		Integer eqpVisitantePrimeitoTempoTotalEscanteio = 2;
+		Integer eqpVisitanteSegundoTempoTotalGol = 2;
+		Integer eqpVisitanteSegundoTempoTotalEscanteio = 2;
+
+
+		atualizarJogo(jogoId,
+				campeonato, numeroRodada,
+				mandante,
+				eqpMandantePrimeitoTempoTotalGol,
+				eqpMandantePrimeitoTempoTotalEscanteio,
+				eqpMandanteSegundoTempoTotalGol,
+				eqpMandanteSegundoTempoTotalEscanteio,
+
+				visitante,
+				eqpVisitantePrimeitoTempoTotalGol,
+				eqpVisitantePrimeitoTempoTotalEscanteio,
+				eqpVisitanteSegundoTempoTotalGol,
+				eqpVisitanteSegundoTempoTotalEscanteio
+				);
+
+		//Confirmar que foi alterado
+		JogoResponseDto jogo = buscarJogo(jogoId);
+
+
+		assertEquals(mandante.getNome(), jogo.getEqpMandante().getNome());
+		assertEquals(visitante.getNome(), jogo.getEqpVisitante().getNome());
+		assertEquals(eqpVisitantePrimeitoTempoTotalGol, jogo.getEqpVisitantePrimeitoTempoTotalGol() );
+	}
+
+
+	
+	@Test
+	@Order(4)
+	@Description("Atualizar jogo inexistente")
+	void updateJogoInexistente() {
+		Integer numeroRodada = 1;
+
+		Integer eqpMandantePrimeitoTempoTotalGol = 1;
+		Integer eqpMandantePrimeitoTempoTotalEscanteio = 1;
+		Integer eqpMandanteSegundoTempoTotalGol = 1;
+		Integer eqpMandanteSegundoTempoTotalEscanteio = 1;
+
+		Integer eqpVisitantePrimeitoTempoTotalGol = 2;
+		Integer eqpVisitantePrimeitoTempoTotalEscanteio = 2;
+		Integer eqpVisitanteSegundoTempoTotalGol = 2;
+		Integer eqpVisitanteSegundoTempoTotalEscanteio = 2;
+
+
+		int statusCode = atualizarJogoInexistente(100L,
+				campeonato, numeroRodada,
+				mandante,
+				eqpMandantePrimeitoTempoTotalGol,
+				eqpMandantePrimeitoTempoTotalEscanteio,
+				eqpMandanteSegundoTempoTotalGol,
+				eqpMandanteSegundoTempoTotalEscanteio,
+
+				visitante,
+				eqpVisitantePrimeitoTempoTotalGol,
+				eqpVisitantePrimeitoTempoTotalEscanteio,
+				eqpVisitanteSegundoTempoTotalGol,
+				eqpVisitanteSegundoTempoTotalEscanteio
+				);
+
 		
+		assertEquals(404, statusCode);
+	}
+	
+	
+	
+	
+	private Long criarEquipe(String nome) {
+		EquipeDto equipeDto = new EquipeDto();
+		equipeDto.setNome(nome);
+
+		var equipeId = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .body(equipeDto)
+                .when()
+                .post("/equipe/v1")
+                .then()
+                .statusCode(201)
+                .extract()
+                .jsonPath()
+                .getLong("id");
+
+		return equipeId;
+	}
+
+
+	private EquipeResponseDto buscarEquipe(Long id) {
+		EquipeResponseDto equipeResponseDto = RestAssured.given()
+				.header("Authorization", "Bearer " + accessToken)
+			    .contentType("application/json")
+			    .when()
+			    .get("/equipe/v1/" + id)
+			    .then()
+			    .statusCode(200)
+			    .extract()
+			    .as(EquipeResponseDto.class);
+
+
+		return equipeResponseDto;
+	}
+
+
+	private Long criarCampeonato(String nome) {
+		String descricao = "Principal competição de pontos corridos...";
+		Boolean ativo = true;
+
 		CampeonatoDto campeonatoDto = new CampeonatoDto();
 		campeonatoDto.setNome(nome);
 		campeonatoDto.setDescricao(descricao);
 		campeonatoDto.setAtivo(ativo);
-		
-		var campeonatoResponseDto = RestAssured.given()
+
+		var campeonatoId = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .body(campeonatoDto)
@@ -80,70 +286,68 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
                 .then()
                 .statusCode(201)
                 .extract()
-                .as(CampeonatoResponseDto.class);
-		assertNotNull(campeonatoResponseDto);
-		
-		var campeonato = ModelMaperConverter.parseObject(campeonatoResponseDto, Campeonato.class);
-		
-		
-		//criando equipe mandante
-		String eqpMandante = "Cuiabá";
-		
-		EquipeDto equipeDto = new EquipeDto(eqpMandante);
-		equipeDto.setNome(eqpMandante);
-		
-		var equipeMandante = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .body(equipeDto)
-                .when()
-                .post("/equipe/v1")
-                .then()
-                .statusCode(201)
-                .extract()
-                .as(EquipeResponseDto.class);	
-		assertNotNull(equipeMandante);
-		
-		var eqMandante = ModelMaperConverter.parseObject(equipeMandante, Equipe.class);
+                .jsonPath()
+                .getLong("id");
 
-		
-		
-		//criando equipe visitante
-		equipeDto = new EquipeDto("Cruzeiro");
-		var equipeVisitante = RestAssured.given()
+		return campeonatoId;
+	}
+
+
+	private CampeonatoResponseDto buscarCampeonato(Long id) {
+		CampeonatoResponseDto campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
-                .body(equipeDto)
                 .when()
-                .post("/equipe/v1")
+                .get("/campeonato/v1/" + id)
                 .then()
-                .statusCode(201)
+                .statusCode(200)
                 .extract()
-                .as(EquipeResponseDto.class);		
-		assertNotNull(equipeVisitante);
-		
-		var eqVisitante = ModelMaperConverter.parseObject(equipeVisitante, Equipe.class);		
-		
-		
+                .as(CampeonatoResponseDto.class);
+
+
+		return campeonatoResponseDto;
+	}
+
+
+	private Long criarJogo(
+			Campeonato campeonato,
+			Integer numeroRodada,
+
+			//===== MANDANTE =====
+			Equipe eqpMandante,
+			Integer eqpMandantePrimeitoTempoTotalGol,
+			Integer eqpMandantePrimeitoTempoTotalEscanteio,
+			Integer eqpMandanteSegundoTempoTotalGol,
+			Integer eqpMandanteSegundoTempoTotalEscanteio,
+
+
+			//===== VISITANTE =====
+			Equipe eqpVisitante,
+			Integer eqpVisitantePrimeitoTempoTotalGol,
+			Integer eqpVisitantePrimeitoTempoTotalEscanteio,
+			Integer eqpVisitanteSegundoTempoTotalGol,
+			Integer eqpVisitanteSegundoTempoTotalEscanteio
+			) {
 		JogoDto jogoDto = new JogoDto();
 		jogoDto.setCampeonato(campeonato);
-		
-		jogoDto.setNumeroRodada(26);
-		jogoDto.setEqpMandante(eqMandante);
-		jogoDto.setEqpVisitante(eqVisitante);
 
-		jogoDto.setEqpMandantePrimeitoTempoTotalGol(0);
-		jogoDto.setEqpMandantePrimeitoTempoTotalEscanteio(2);
-		jogoDto.setEqpMandanteSegundoTempoTotalGol(0);
-		jogoDto.setEqpMandanteSegundoTempoTotalEscanteio(3);
+		jogoDto.setNumeroRodada(numeroRodada);
 
-		jogoDto.setEqpVisitantePrimeitoTempoTotalGol(0);
-		jogoDto.setEqpVisitantePrimeitoTempoTotalEscanteio(1);
-		jogoDto.setEqpVisitanteSegundoTempoTotalGol(0);
-		jogoDto.setEqpVisitanteSegundoTempoTotalEscanteio(4);
+		jogoDto.setEqpMandante(eqpMandante);
+		jogoDto.setEqpMandantePrimeitoTempoTotalGol(eqpMandantePrimeitoTempoTotalGol);
+		jogoDto.setEqpMandantePrimeitoTempoTotalEscanteio(eqpMandantePrimeitoTempoTotalEscanteio);
+		jogoDto.setEqpMandanteSegundoTempoTotalGol(eqpMandantePrimeitoTempoTotalEscanteio);
+		jogoDto.setEqpMandanteSegundoTempoTotalEscanteio(eqpMandanteSegundoTempoTotalEscanteio);
 
-		
-		jogoId = RestAssured.given()
+
+		jogoDto.setEqpVisitante(eqpVisitante);
+		jogoDto.setEqpVisitantePrimeitoTempoTotalGol(eqpVisitantePrimeitoTempoTotalGol);
+		jogoDto.setEqpVisitantePrimeitoTempoTotalEscanteio(eqpVisitantePrimeitoTempoTotalEscanteio);
+		jogoDto.setEqpVisitanteSegundoTempoTotalGol(eqpVisitanteSegundoTempoTotalGol);
+		jogoDto.setEqpVisitanteSegundoTempoTotalEscanteio(eqpVisitanteSegundoTempoTotalEscanteio);
+
+
+		var jogoId = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .body(jogoDto)
@@ -154,97 +358,133 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
                 .extract()
                 .jsonPath()
                 .getLong("id");
-		
-		System.out.println("ID do Jogo gerado: " + jogoId);
-		assertNotNull(jogoId);
+
+
+		return jogoId;
 	}
-	
-	@Test
-	@Order(2)
-	@Description("Buscar jogo criado por ID e validar nome")
-	void findByAuditId() {
-		String cameponatoEsperado = "Brasileirão série A 2023";
-	
-        
-        JogoResponseDto jogoResponseDto = RestAssured.given()
-        	    .header("Authorization", "Bearer " + accessToken)
-        	    .contentType("application/json")
-        	    .when()
-        	    .get("/jogo/v1/" + jogoId)
-        	    .then()
-        	    .statusCode(200)
-        	    .extract()
-        	    .as(JogoResponseDto.class);
-		
-		assertEquals(cameponatoEsperado, jogoResponseDto.getCampeonato().getNome());
+
+
+	private JogoResponseDto buscarJogo(Long id) {
+		JogoResponseDto jogoResponseDto = RestAssured.given()
+				.header("Authorization", "Bearer " + accessToken)
+			    .contentType("application/json")
+			    .when()
+			    .get("/jogo/v1/" + id)
+			    .then()
+			    .statusCode(200)
+			    .extract()
+			    .as(JogoResponseDto.class);
+
+
+		return jogoResponseDto;
 	}
-	
-	
-	
-	//@Test
-	@Order(3)
-	@Description("Atualizar os dados do jogo")
-	void update() {
-		String nomeCamp = "Brasileirão série A 2023";
-		String descricao = "Principal competição de pontos corridos do Brasil.";
-		Boolean ativo = true;
-		
-		Integer numeroRodadaModificado = 28;
 
-	    Campeonato campeonato = new Campeonato();
-	    campeonato.setNome(nomeCamp);
-	    campeonato.setDescricao(descricao);
-	    campeonato.setAtivo(ativo);
-	    
-	    
-	    String eqpMandante = "Cuiabá";
-		
-		EquipeDto equipeDto = new EquipeDto(eqpMandante);
-		equipeDto.setNome(eqpMandante);
 
-	    Equipe visitante = new Equipe();
-	    visitante.setNome(equipeVisitante);
+	private void atualizarJogo(
+			Long id,
 
-	    JogoDto jogoDto = new JogoDto();
-	    jogoDto.setNumeroRodada(numeroRodadaModificado);
-	    jogoDto.setCampeonato(campeonato);
-	    //jogoDto.setEqpMandante(eqMandante);
-	    jogoDto.setEqpVisitante(visitante);
+			Campeonato campeonato,
+			Integer numeroRodada,
 
-	    jogoDto.setEqpMandantePrimeitoTempoTotalGol(1);
-	    jogoDto.setEqpMandantePrimeitoTempoTotalEscanteio(2);
-	    jogoDto.setEqpMandanteSegundoTempoTotalGol(1);
-	    jogoDto.setEqpMandanteSegundoTempoTotalEscanteio(3);
+			//===== MANDANTE =====
+			Equipe eqpMandante,
+			Integer eqpMandantePrimeitoTempoTotalGol,
+			Integer eqpMandantePrimeitoTempoTotalEscanteio,
+			Integer eqpMandanteSegundoTempoTotalGol,
+			Integer eqpMandanteSegundoTempoTotalEscanteio,
 
-	    jogoDto.setEqpVisitantePrimeitoTempoTotalGol(0);
-	    jogoDto.setEqpVisitantePrimeitoTempoTotalEscanteio(2);
-	    jogoDto.setEqpVisitanteSegundoTempoTotalGol(1);
-	    jogoDto.setEqpVisitanteSegundoTempoTotalEscanteio(4);
 
-	    RestAssured.given()
-	        .header("Authorization", "Bearer " + accessToken)
-	        .contentType("application/json")
-	        .body(jogoDto)
-	        .log().all()
-	        .when()
-	        .put("/jogo/v1/" + jogoId)
-	        .then()
-	        .log().all()
-	        .statusCode(200);
+			//===== VISITANTE =====
+			Equipe eqpVisitante,
+			Integer eqpVisitantePrimeitoTempoTotalGol,
+			Integer eqpVisitantePrimeitoTempoTotalEscanteio,
+			Integer eqpVisitanteSegundoTempoTotalGol,
+			Integer eqpVisitanteSegundoTempoTotalEscanteio
+			) {
+		JogoDto jogoDto = new JogoDto();
+		jogoDto.setCampeonato(campeonato);
 
-	    // Confirmação da atualização
-	    JogoResponseDto jogoResponseDto = RestAssured.given()
-	        .header("Authorization", "Bearer " + accessToken)
-	        .contentType("application/json")
-	        .when()
-	        .get("/jogo/v1/" + jogoId)
-	        .then()
-	        .statusCode(200)
-	        .extract()
-	        .as(JogoResponseDto.class);
+		jogoDto.setNumeroRodada(numeroRodada);
 
-	    assertEquals(numeroRodadaModificado, jogoResponseDto.getNumeroRodada());
+		jogoDto.setEqpMandante(eqpMandante);
+		jogoDto.setEqpMandantePrimeitoTempoTotalGol(eqpMandantePrimeitoTempoTotalGol);
+		jogoDto.setEqpMandantePrimeitoTempoTotalEscanteio(eqpMandantePrimeitoTempoTotalEscanteio);
+		jogoDto.setEqpMandanteSegundoTempoTotalGol(eqpMandantePrimeitoTempoTotalEscanteio);
+		jogoDto.setEqpMandanteSegundoTempoTotalEscanteio(eqpMandanteSegundoTempoTotalEscanteio);
+
+
+		jogoDto.setEqpVisitante(eqpVisitante);
+		jogoDto.setEqpVisitantePrimeitoTempoTotalGol(eqpVisitantePrimeitoTempoTotalGol);
+		jogoDto.setEqpVisitantePrimeitoTempoTotalEscanteio(eqpVisitantePrimeitoTempoTotalEscanteio);
+		jogoDto.setEqpVisitanteSegundoTempoTotalGol(eqpVisitanteSegundoTempoTotalGol);
+		jogoDto.setEqpVisitanteSegundoTempoTotalEscanteio(eqpVisitanteSegundoTempoTotalEscanteio);
+
+
+		RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .body(jogoDto)
+                .when()
+                .put("/jogo/v1/" + id)
+                .then()
+                .statusCode(200);
 	}
 	
 	
+	private int atualizarJogoInexistente(
+			Long id,
+
+			Campeonato campeonato,
+			Integer numeroRodada,
+
+			//===== MANDANTE =====
+			Equipe eqpMandante,
+			Integer eqpMandantePrimeitoTempoTotalGol,
+			Integer eqpMandantePrimeitoTempoTotalEscanteio,
+			Integer eqpMandanteSegundoTempoTotalGol,
+			Integer eqpMandanteSegundoTempoTotalEscanteio,
+
+
+			//===== VISITANTE =====
+			Equipe eqpVisitante,
+			Integer eqpVisitantePrimeitoTempoTotalGol,
+			Integer eqpVisitantePrimeitoTempoTotalEscanteio,
+			Integer eqpVisitanteSegundoTempoTotalGol,
+			Integer eqpVisitanteSegundoTempoTotalEscanteio
+			) {
+		JogoDto jogoDto = new JogoDto();
+		jogoDto.setCampeonato(campeonato);
+
+		jogoDto.setNumeroRodada(numeroRodada);
+
+		jogoDto.setEqpMandante(eqpMandante);
+		jogoDto.setEqpMandantePrimeitoTempoTotalGol(eqpMandantePrimeitoTempoTotalGol);
+		jogoDto.setEqpMandantePrimeitoTempoTotalEscanteio(eqpMandantePrimeitoTempoTotalEscanteio);
+		jogoDto.setEqpMandanteSegundoTempoTotalGol(eqpMandantePrimeitoTempoTotalEscanteio);
+		jogoDto.setEqpMandanteSegundoTempoTotalEscanteio(eqpMandanteSegundoTempoTotalEscanteio);
+
+
+		jogoDto.setEqpVisitante(eqpVisitante);
+		jogoDto.setEqpVisitantePrimeitoTempoTotalGol(eqpVisitantePrimeitoTempoTotalGol);
+		jogoDto.setEqpVisitantePrimeitoTempoTotalEscanteio(eqpVisitantePrimeitoTempoTotalEscanteio);
+		jogoDto.setEqpVisitanteSegundoTempoTotalGol(eqpVisitanteSegundoTempoTotalGol);
+		jogoDto.setEqpVisitanteSegundoTempoTotalEscanteio(eqpVisitanteSegundoTempoTotalEscanteio);
+
+
+		Response response = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .body(jogoDto)
+                .when()
+                .put("/jogo/v1/" + id);
+		
+		int statusCode = response.getStatusCode();
+		
+		return statusCode;		
+	}
+	
+
+
+
+
 }

@@ -90,10 +90,10 @@ class EquipeControllerTest extends AplicacaoStartTestContainer {
 	@Test
 	@Order(4)
 	@Description("Atualizar equipe inexistente")
-	void updateregistroInexistente() {
+	void updateEquipeInexistente() {
 		String equipeModificada = "Vitória Campeão - :-)";
 		
-		int statusCode = atualizarEquipeInexistente(10L, equipeModificada);
+		int statusCode = atualizarEquipeInexistente(100L, equipeModificada);
 		
 		assertEquals(404, statusCode);
 	}
