@@ -27,6 +27,7 @@ import br.com.claudemirojr.trade.model.service.JogoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 
 @Tag(name = "Jogo", description = "Endpoints para gerenciamento dos jogos")
 @RestController
@@ -112,7 +113,7 @@ public class JogoController {
 	
 	@Operation(summary = "Análise do mandante X visitante em um determinado campeonato, especificando o número de jogos a ser analisado")
 	@GetMapping("/analise/campeonato/{idCampeonato}/mandante/{idMandante}/visitante/{idVisitante}/jogos/{limiteDeJogos}")
-	public JogoAnaliseResponseDto findByAnaliseMandanteXVisitante( @PathVariable Long idCampeonato, @PathVariable Long idMandante, @PathVariable Long idVisitante, @PathVariable Long limiteDeJogos) {
+	public JogoAnaliseResponseDto findByAnaliseMandanteXVisitante( @PathVariable Long idCampeonato, @PathVariable Long idMandante, @PathVariable Long idVisitante, @PathVariable @Min(value = 5, message = "O limite mínimo de jogos para análise é 5") Long limiteDeJogos) {
 		return jogoService.findByAnaliseMandanteXVisitante(idCampeonato, idMandante, idVisitante, limiteDeJogos);
 	}
 	
