@@ -193,7 +193,7 @@ public class JogoServiceImpl implements JogoService {
 		
 		else {
 			//TODO: Fazer a busca por nome.
-			page = jogoRepository.findByIdGreaterThanEqual(Long.parseLong(valor), pageable);
+			page = jogoRepository.findByCampeonatoNomeContainingIgnoreCase(valor, pageable);
 		}
 		
 		

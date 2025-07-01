@@ -19,31 +19,33 @@ import org.springframework.context.annotation.Description;
 import br.com.claudemirojr.trade.dto.EquipeDto;
 import br.com.claudemirojr.trade.dto.EquipeResponseDto;
 import br.com.claudemirojr.trade.model.repository.EquipeRepository;
-import br.com.claudemirojr.trade.testcontainer.AplicacaoTestContainer;
+import br.com.claudemirojr.trade.testcontainer.AplicacaoStartTestContainer;
 import br.com.claudemirojr.trade.util.AuthUtil;
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class EquipeControllerTest extends AplicacaoTestContainer {
+class EquipeControllerTest extends AplicacaoStartTestContainer {
 
 	@Autowired
 	private EquipeRepository equipeRepository;
 
 	private String accessToken;
 	private Long equipeId;
-	
+
+
 	@LocalServerPort
-	private int port;	
-	
+	private int port;
+
 
 	@BeforeAll
 	void obterToken() {
 		equipeRepository.deleteAll();
 
 		accessToken = AuthUtil.obterToken();
-		
+
 		RestAssured.port = port;
 		RestAssured.basePath = "/api/trade";
 	}
@@ -53,11 +55,136 @@ class EquipeControllerTest extends AplicacaoTestContainer {
 	@Order(1)
 	@Description("Criar uma nova equipe chamada Bahia")
 	void create() {
-		String nome = "Bahia";
+		equipeId = criarEquipe("Bahia");
 
+		assertNotNull(equipeId);
+	}
+
+
+	@Test
+	@Order(2)
+	@Description("Buscar equipe criada por ID e validar nome")
+	void findByAuditId() {
+		String equipeEsperada = "Bahia";
+
+		EquipeResponseDto equipeResponseDto = buscarEquipe(equipeId);
+
+		assertEquals(equipeEsperada, equipeResponseDto.getNome());
+	}
+
+
+	@Test
+	@Order(3)
+	@Description("Atualizar o nome da equipe para Bahia Campeão")
+	void update() {
+		String equipeModificada = "Bahia Campeão";
+		atualizarEquipe(equipeId, equipeModificada);
+
+		//Confirmar que foi alterado
+		EquipeResponseDto equipeResponseDto = buscarEquipe(equipeId);
+
+		assertEquals(equipeModificada, equipeResponseDto.getNome());
+	}
+
+
+	@Test
+	@Order(4)
+	@Description("Atualizar equipe inexistente")
+	void updateEquipeInexistente() {
+		String equipeModificada = "Vitória Campeão - :-)";
+		
+		int statusCode = atualizarEquipeInexistente(100L, equipeModificada);
+		
+		assertEquals(404, statusCode);
+	}
+
+
+	@Test
+	@Order(5)
+	@Description("Listar todas as equipes - com paginação")
+	void findAll() {
+		String nome = "Man City";
+		criarEquipe(nome);
+
+		List<EquipeResponseDto> equipeResponseDto = listarTodasAsEquipes();
+
+		assertEquals(2, equipeResponseDto.size());
+	}
+
+
+	@Test
+	@Order(6)
+	@Description("Listar todas as equipes cujo ID >= 2")
+	void findAllIdMaiorIgual() {
+		List<EquipeResponseDto> equipeResponseDto = listarTodasAsEquipesIdMaiorOuIgual(2L);
+
+		assertEquals(1, equipeResponseDto.size());
+	}
+
+
+	@Test
+	@Order(7)
+	@Description("Listar a equipe pelo nome")
+	void findAllNomeContem() {
+		String equipeModificada = "Bahia Campeão";
+
+		List<EquipeResponseDto> equipeResponseDto = listarTodasAsEquipesContemNome(equipeModificada);
+
+		assertEquals(1, equipeResponseDto.size());
+	}
+
+
+	@Test
+	@Order(8)
+	@Description("Listar todas as equipe - sem paginação")
+	void carregarTodasAsEquipes() {
+		List<EquipeResponseDto> equipeResponseDto = listarTodasAsEquipesSemPaginacao();
+
+		assertEquals(2, equipeResponseDto.size());
+	}
+
+
+	@Test
+	@Order(9)
+	@Description("Filtar as equipes por ID ou Nome")
+	void filterAllPorIdOrNome() {
+		List<EquipeResponseDto> equipeResponseDto = filtroPorIdMaiorOuIgual(1L);
+		assertEquals(2, equipeResponseDto.size());
+
+		equipeResponseDto = filtroPorNome("Bahia");
+		assertEquals(1, equipeResponseDto.size());
+	}
+
+
+	@Test
+	@Order(10)
+	@Description("Excluir a Equipe id=1")
+	void delete() {
+		excluirEquipe(equipeId);
+
+		//Confirmar se o registro foi excluido
+		int statusCode = equipeInexistente(equipeId);
+		
+		assertEquals(404, statusCode);
+	}
+
+
+	@Test
+	@Order(11)
+	@Description("Excluir a Equipe id=10 que não existe")
+	void deleteRegistroInexistente() {
+		int statusCode = equipeInexistente(10L);
+		
+		assertEquals(404, statusCode);
+	}
+
+
+
+
+	private Long criarEquipe(String nome) {
 		EquipeDto equipeDto = new EquipeDto();
 		equipeDto.setNome(nome);
-		
+
 		equipeId = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
@@ -69,39 +196,30 @@ class EquipeControllerTest extends AplicacaoTestContainer {
                 .extract()
                 .jsonPath()
                 .getLong("id");
-		
-		assertNotNull(equipeId);
-	}
-	
-	
-	@Test
-	@Order(2)
-	@Description("Buscar equipe criada por ID e validar nome")
-	void findByAuditId() {
-		String equipeEsperada = "Bahia";
 
-		EquipeResponseDto equipeResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/equipe/v1/" + equipeId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .as(EquipeResponseDto.class);
-		
-		assertEquals(equipeEsperada, equipeResponseDto.getNome());
+		return equipeId;
 	}
-	
-	
-	@Test
-	@Order(3)
-	@Description("Atualizar o nome da equipe para Bahia Campeão")
-	void update() {
-		String equipeModificada = "Bahia Campeão";
-		
+
+
+	private EquipeResponseDto buscarEquipe(Long id) {
+		EquipeResponseDto equipeResponseDto = RestAssured.given()
+				.header("Authorization", "Bearer " + accessToken)
+			    .contentType("application/json")
+			    .when()
+			    .get("/equipe/v1/" + id)
+			    .then()
+			    .statusCode(200)
+			    .extract()
+			    .as(EquipeResponseDto.class);
+
+
+		return equipeResponseDto;
+	}
+
+
+	private void atualizarEquipe(Long id, String nome) {
 		EquipeDto equipeDto = new EquipeDto();
-		equipeDto.setNome(equipeModificada);
+		equipeDto.setNome(nome);
 
 		RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
@@ -111,44 +229,27 @@ class EquipeControllerTest extends AplicacaoTestContainer {
                 .put("/equipe/v1/" + equipeId)
                 .then()
                 .statusCode(200);
-		
-		
-		//Confirmar que foi alterado
-		EquipeResponseDto equipeResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/equipe/v1/" + equipeId)
-                .then()
-                .statusCode(200)
-                .extract()
-                .as(EquipeResponseDto.class);
-		
-		assertEquals(equipeModificada, equipeResponseDto.getNome());
-	}	
+	}
 	
 	
-	
-	@Test
-	@Order(4)
-	@Description("Listar todas as equipes")
-	void findAll() {
-		String nome = "Man City";
-
+	private int atualizarEquipeInexistente(Long id, String nome) {
 		EquipeDto equipeDto = new EquipeDto();
 		equipeDto.setNome(nome);
 
-		//inserindo mais um registro no banco
-		RestAssured.given()
+		Response response = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .body(equipeDto)
                 .when()
-                .post("/equipe/v1")
-                .then()
-                .statusCode(201);
+                .put("/equipe/v1/" + id);
+		
+		int statusCode = response.getStatusCode();
+		
+		return statusCode;
+	}	
+	
 
-		//listando todas as equipes
+	private List<EquipeResponseDto> listarTodasAsEquipes() {
 		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
@@ -158,61 +259,114 @@ class EquipeControllerTest extends AplicacaoTestContainer {
                 .statusCode(200)
                 .extract()
                 .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
-		
-		assertEquals(2, equipeResponseDto.size());
-	}		
-	
-	
-	@Test
-	@Order(5)
-	@Description("Listar a equipe pelo nome")
-	void findAllNomeContem() {
-		String equipeModificada = "Bahia Campeão";
-		
+                .getList("content", EquipeResponseDto.class);
+
+		return equipeResponseDto;
+	}
+
+
+	private List<EquipeResponseDto> listarTodasAsEquipesSemPaginacao() {
 		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .get("/equipe/v1/search-nome/" + equipeModificada)
+                .get("/equipe/v1/search-all")
                 .then()
                 .statusCode(200)
                 .extract()
-                //.as(new TypeRef<List<EquipeResponseDto>>() {});
                 .jsonPath()
-                .getList("content", EquipeResponseDto.class);   
-		
-		assertEquals(1, equipeResponseDto.size());
-	}
-	
+                .getList("content", EquipeResponseDto.class);
 
-	
-	
-	
-	@Test
-	@Order(6)
-	@Description("Excluir a Equipe id=1")
-	void delete() {
-		//Excluir o registro id=1
+		return equipeResponseDto;
+	}
+
+
+	private List<EquipeResponseDto> listarTodasAsEquipesIdMaiorOuIgual(Long id) {
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/search-id-maior-igual/" + id)
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);
+
+		return equipeResponseDto;
+	}
+
+
+	private List<EquipeResponseDto> listarTodasAsEquipesContemNome(String nome) {
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/search-nome/" + nome)
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);
+
+		return equipeResponseDto;
+
+	}
+
+
+	private List<EquipeResponseDto> filtroPorIdMaiorOuIgual(Long id) {
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/filter/" + id)
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);
+
+		return equipeResponseDto;
+	}
+
+
+	private List<EquipeResponseDto> filtroPorNome(String nome) {
+		List<EquipeResponseDto> equipeResponseDto = RestAssured.given()
+        		.header("Authorization", "Bearer " + accessToken)
+                .contentType("application/json")
+                .when()
+                .get("/equipe/v1/filter/" + nome)
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content", EquipeResponseDto.class);
+
+		return equipeResponseDto;
+	}
+
+
+	private void excluirEquipe(Long id) {
 		RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .delete("/equipe/v1/" + equipeId)
+                .delete("/equipe/v1/" + id)
                 .then()
                 .statusCode(200);
-		
-		//Confirmar se o registro foi excluido
-		RestAssured.given()
+	}
+	
+	private int equipeInexistente(Long id) {
+		Response response =  RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
-                .get("/equipe/v1/" + equipeId)
-                .then()
-                .statusCode(404);
+                .get("/equipe/v1/" + id);
 		
-	}		
-	
-	
-	
+		int statusCode = response.getStatusCode();
+		
+		return statusCode;
+	}
+
+
 }

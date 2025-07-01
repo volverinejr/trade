@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import br.com.claudemirojr.trade.model.entity.Campeonato;
 import br.com.claudemirojr.trade.model.entity.Equipe;
 import br.com.claudemirojr.trade.model.repository.IJogoDados;
@@ -17,6 +19,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class JogoAnaliseResponseDto implements Serializable {
 	private static final long serialVersionUID = 1L;
 

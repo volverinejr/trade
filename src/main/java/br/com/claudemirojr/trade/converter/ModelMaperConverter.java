@@ -1,8 +1,5 @@
 package br.com.claudemirojr.trade.converter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.modelmapper.ModelMapper;
 
 public class ModelMaperConverter {
@@ -13,6 +10,7 @@ public class ModelMaperConverter {
 		return mapper.map(origin, destination);
 	}
 
+	/*
 	public static <O, D> List<D> parseListObjects(List<O> origin, Class<D> destination) {
 		List<D> destinationObjects = new ArrayList<D>();
 		for (Object o : origin) {
@@ -20,5 +18,6 @@ public class ModelMaperConverter {
 		}
 		return destinationObjects;
 	}
+	*/
 
 }

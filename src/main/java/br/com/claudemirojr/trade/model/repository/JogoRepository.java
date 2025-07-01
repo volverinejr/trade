@@ -16,7 +16,7 @@ public interface JogoRepository extends JpaRepository<Jogo, Long> {
 
 	Page<Jogo> findByIdGreaterThanEqual(Long id, Pageable pageable);
 	
-	//Page<Jogo> findByNomeIgnoreCaseContaining(String nome, Pageable pageable);
+	Page<Jogo> findByCampeonatoNomeContainingIgnoreCase(String nome, Pageable pageable);
 
 
 	List<Jogo> findTop5ByCampeonatoAndEqpMandanteOrderByNumeroRodadaDesc(Campeonato campeonato, Equipe eqpMandante);

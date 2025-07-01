@@ -7,7 +7,7 @@ import org.testcontainers.utility.DockerImageName;
 
 import com.redis.testcontainers.RedisContainer;
 
-public class AplicacaoTestContainer {
+public class AplicacaoStartTestContainer {
 
 	private static final MySQLContainer<?> CONTAINERMYSQL;
 	private static final RedisContainer CONTAINERREDIS;
@@ -32,28 +32,15 @@ public class AplicacaoTestContainer {
 	
 	@DynamicPropertySource
 	static void properties(DynamicPropertyRegistry registry) {
-		var mysql = AplicacaoTestContainer.getInstanceMysql();
+		var mysql = AplicacaoStartTestContainer.getInstanceMysql();
 		registry.add("spring.datasource.url", mysql::getJdbcUrl);
 		registry.add("spring.datasource.username", mysql::getUsername);
 		registry.add("spring.datasource.password", mysql::getPassword);
 		
-		var redis = AplicacaoTestContainer.getInstanceRedis();
+		var redis = AplicacaoStartTestContainer.getInstanceRedis();
 		registry.add("spring.data.redis.host", redis::getHost);
 		registry.add("spring.data.redis.port", () -> redis.getMappedPort(6379));
 		
 	}
-	
-	
-	
-
-
-/*
-	@DynamicPropertySource
-	static void properties(DynamicPropertyRegistry registry) {
-		var redis = RedisTestContainer.getInstance();
-		registry.add("spring.redis.host", redis::getHost);
-		registry.add("spring.redis.port", () -> redis.getMappedPort(6379));
-	}
-	*/
 
 }

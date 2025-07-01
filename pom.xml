@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.0</version>
+		<version>3.5.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.claudemirojr.trade</groupId>
@@ -202,18 +202,21 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			
-			
+		
 			<plugin>
 			  <groupId>org.jacoco</groupId>
 			  <artifactId>jacoco-maven-plugin</artifactId>
-			  <version>0.8.10</version>
+			  <version>0.8.13</version>
 			  <executions>
+			    <!-- Executa o agente antes dos testes -->
 			    <execution>
 			      <id>prepare-agent</id>
 			      <goals>
 			        <goal>prepare-agent</goal>
 			      </goals>
 			    </execution>
+			
+			    <!-- Gera o relatório HTML (opcional, para visualização) -->
 			    <execution>
 			      <id>report</id>
 			      <phase>verify</phase>
@@ -221,8 +224,40 @@
 			        <goal>report</goal>
 			      </goals>
 			    </execution>
+			
+			    <!-- Aqui é onde a cobertura mínima é validada de verdade -->
+			    <execution>
+			      <id>check</id>
+			      <phase>verify</phase>
+			      <!--
+			      <goals>
+			        <goal>check</goal>
+			      </goals>
+			      -->
+			      <configuration>
+			        <rules>
+			          <rule>
+			            <element>CLASS</element>
+			            <includes>
+							<include>br/com/claudemirojr/trade/model/service/*</include>
+							<include>br/com/claudemirojr/trade/controller/*</include>
+			             </includes>
+			             <limits>
+				            <limit>
+				              <counter>METHOD</counter>
+				              <value>COVEREDRATIO</value>
+				              <minimum>0.80</minimum> <!-- 80% de cobertura mínima -->
+				            </limit>
+			            </limits>
+			        	<failOnViolation>false</failOnViolation>
+			          </rule>
+			        </rules>
+			      </configuration>
+			    </execution>
+
 			  </executions>
 			</plugin>
+		
 			
 		</plugins>
 	</build>
