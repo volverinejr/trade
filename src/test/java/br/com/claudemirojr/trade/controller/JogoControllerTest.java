@@ -22,7 +22,6 @@ import br.com.claudemirojr.trade.dto.CampeonatoDto;
 import br.com.claudemirojr.trade.dto.CampeonatoResponseDto;
 import br.com.claudemirojr.trade.dto.EquipeDto;
 import br.com.claudemirojr.trade.dto.EquipeResponseDto;
-import br.com.claudemirojr.trade.dto.JogoAnaliseResponseDto;
 import br.com.claudemirojr.trade.dto.JogoDto;
 import br.com.claudemirojr.trade.dto.JogoResponseDto;
 import br.com.claudemirojr.trade.model.entity.Campeonato;
@@ -41,22 +40,21 @@ import io.restassured.response.Response;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class JogoControllerTest extends AplicacaoStartTestContainer {
 
-	
+
 	@Autowired
 	private EquipeRepository equipeRepository;
 
 	@Autowired
 	private JogoRepository jogoRepository;
-	
+
 	@Autowired
 	private CampeonatoRepository campeonatoRepository;
-	
+
 	private String accessToken;
 	private Long jogoId;
 	private Campeonato campeonato;
 	private Equipe mandante;
 	private Equipe visitante;
-	private Equipe limite;
 
 
 	@LocalServerPort
@@ -66,9 +64,9 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 	@BeforeAll
 	void obterToken() {
 		campeonatoRepository.deleteAll();
-		
+
 		equipeRepository.deleteAll();
-		
+
 		jogoRepository.deleteAll();
 
 		accessToken = AuthUtil.obterToken();
@@ -197,7 +195,6 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 	}
 
 
-	
 	@Test
 	@Order(4)
 	@Description("Atualizar jogo inexistente")
@@ -230,18 +227,16 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 				eqpVisitanteSegundoTempoTotalEscanteio
 				);
 
-		
+
 		assertEquals(404, statusCode);
 	}
-	
-	
-	
-	
+
+
 	@Test
 	@Order(5)
 	@Description("Listar todos os jogos")
 	void findAll() {
-		//listando todas as equipes
+		//listando todas os jogos
 		List<JogoResponseDto> jogoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
@@ -251,12 +246,12 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
                 .statusCode(200)
                 .extract()
                 .jsonPath()
-                .getList("content", JogoResponseDto.class);   
-		
+                .getList("content", JogoResponseDto.class);
+
 		assertEquals(1, jogoResponseDto.size());
 	}
-	
-	
+
+
 	@Test
 	@Order(6)
 	@Description("Listar todos os jogos cujo ID >= 1")
@@ -271,20 +266,19 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
                 .statusCode(200)
                 .extract()
                 .jsonPath()
-                .getList("content", JogoResponseDto.class);   
-		
+                .getList("content", JogoResponseDto.class);
+
 		assertEquals(1, jogoResponseDto.size());
 	}
-	
-	
-	
+
+
 	@Test
 	@Order(7)
 	@Description("Filtrar o jogo por id ou nome do campeonato")
 	void findAllNomeContem() {
-		Long filtroId = 1L;		
+		Long filtroId = 1L;
 		String filtroNome = "Brasileirão";
-		
+
 		//filtrando jogo por id
 		List<JogoResponseDto> jogosPorId = RestAssured.given()
 		        .header("Authorization", "Bearer " + accessToken)
@@ -295,10 +289,10 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 		        .statusCode(200)
 		        .extract()
 		        .jsonPath()
-		        .getList("content", JogoResponseDto.class);   
-				
+		        .getList("content", JogoResponseDto.class);
+
 		assertTrue(jogosPorId.size() > 0);
-				
+
 				//filtrando jogo por nome
 		List<JogoResponseDto> jogosPorNome = RestAssured.given()
 		        .header("Authorization", "Bearer " + accessToken)
@@ -309,17 +303,17 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 		        .statusCode(200)
 		        .extract()
 		        .jsonPath()
-		        .getList("content", JogoResponseDto.class);   
-				
+		        .getList("content", JogoResponseDto.class);
+
 
 				assertTrue(jogosPorNome.size() > 0);
-				
-					
+
+
 	}
-	
-	
+
+
 	@Test
-	@Order(10)
+	@Order(8)
 	@Description("Excluir um jogo id=1")
 	void delete() {
 		//Excluir o registro id=1
@@ -330,7 +324,7 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
                 .delete("/jogo/v1/" + jogoId)
                 .then()
                 .statusCode(200);
-		
+
 		//Confirmar se o registro foi excluido
 		RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
@@ -339,11 +333,12 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
                 .get("/jogo/v1/" + jogoId)
                 .then()
                 .statusCode(404);
-		
+
 	}
-	
+
+
 	@Test
-	@Order(11)
+	@Order(9)
 	@Description("Excluir jogo id=10 que não existe")
 	void deleteRegistroInexistente() {
 		//Excluir o registro id=10
@@ -355,9 +350,8 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
                 .then()
                 .statusCode(404);
 	}
-		
-	
-	
+
+
 	private Long criarEquipe(String nome) {
 		EquipeDto equipeDto = new EquipeDto();
 		equipeDto.setNome(nome);
@@ -433,7 +427,6 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 
 		return campeonatoResponseDto;
 	}
-
 
 
 	private Long criarJogo(
@@ -556,8 +549,8 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
                 .then()
                 .statusCode(200);
 	}
-	
-	
+
+
 	private int atualizarJogoInexistente(
 			Long id,
 
@@ -604,14 +597,10 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
                 .body(jogoDto)
                 .when()
                 .put("/jogo/v1/" + id);
-		
+
 		int statusCode = response.getStatusCode();
-		
-		return statusCode;		
+
+		return statusCode;
 	}
-	
-
-
-
 
 }
