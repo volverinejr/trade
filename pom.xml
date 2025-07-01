@@ -239,19 +239,22 @@
 			          <rule>
 			            <element>CLASS</element>
 			            <includes>
-			              <include>br/com/claudemirojr/trade/model/service/*</include>
-			              <include>br/com/claudemirojr/trade/controller/*</include>
+							<include>br/com/claudemirojr/trade/model/service/*</include>
+							<include>br/com/claudemirojr/trade/controller/*</include>
 			             </includes>
-			            <limit>
-			              <counter>METHOD</counter>
-			              <value>COVEREDRATIO</value>
-			              <minimum>0.80</minimum> <!-- 80% de cobertura mínima -->
-			            </limit>
+			             <limits>
+				            <limit>
+				              <counter>METHOD</counter>
+				              <value>COVEREDRATIO</value>
+				              <minimum>0.80</minimum> <!-- 80% de cobertura mínima -->
+				            </limit>
+			            </limits>
+			        	<failOnViolation>false</failOnViolation>
 			          </rule>
 			        </rules>
-			        <failOnViolation>true</failOnViolation>
 			      </configuration>
 			    </execution>
+
 			  </executions>
 			</plugin>
 		

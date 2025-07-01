@@ -18,8 +18,6 @@ import org.springframework.context.annotation.Description;
 
 import br.com.claudemirojr.trade.dto.CampeonatoDto;
 import br.com.claudemirojr.trade.dto.CampeonatoResponseDto;
-import br.com.claudemirojr.trade.dto.EquipeDto;
-import br.com.claudemirojr.trade.dto.EquipeResponseDto;
 import br.com.claudemirojr.trade.model.repository.CampeonatoRepository;
 import br.com.claudemirojr.trade.testcontainer.AplicacaoStartTestContainer;
 import br.com.claudemirojr.trade.util.AuthUtil;
@@ -30,28 +28,28 @@ import io.restassured.response.Response;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CampeonatoControllerTest extends AplicacaoStartTestContainer {
-	
+
 	@Autowired
 	private CampeonatoRepository campeonatoRepository;
 
 	private String accessToken;
 	private Long campeonatoId;
-	
+
 	@LocalServerPort
-	private int port;	
-	
+	private int port;
+
 
 	@BeforeAll
 	void obterToken() {
 		campeonatoRepository.deleteAll();
 
 		accessToken = AuthUtil.obterToken();
-		
+
 		RestAssured.port = port;
 		RestAssured.basePath = "/api/trade";
 	}
-	
-	
+
+
 	@Test
 	@Order(1)
 	@Description("Criar um novo campeonato chamado Premier League 2023/2023")
@@ -60,7 +58,8 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		assertNotNull(campeonatoId);
 	}
-	
+
+
 	@Test
 	@Order(2)
 	@Description("Buscar campeonato criado por ID e validar nome")
@@ -71,8 +70,8 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		assertEquals(campeonatoEsperado, campeonatoResponseDto.getNome());
 	}
-	
-	
+
+
 	@Test
 	@Order(3)
 	@Description("Atualizar o nome do campeonato para Brasileirão")
@@ -86,21 +85,19 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		assertEquals(campeonatoModificado, campeonatoResponseDto.getNome());
 	}
 
-	
+
 	@Test
 	@Order(4)
 	@Description("Atualizar campeonato inexistente")
-	void updateEquipeInexistente() {
+	void updateCampeonatoInexistente() {
 		String campeonatoModificado = "La liga";
-		
+
 		int statusCode = atualizarCampeonatoInexistente(100L, campeonatoModificado,"Campeonato espanhol",true);
-		
+
 		assertEquals(404, statusCode);
 	}
 
-	
-	
-	
+
 	@Test
 	@Order(5)
 	@Description("Listar todos os campeonatos - com paginação")
@@ -115,8 +112,7 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		assertEquals(2, campeonatoResponseDto.size());
 	}
 
-	
-	
+
 	@Test
 	@Order(6)
 	@Description("Listar todos os campeonatos cujo ID >= 2")
@@ -126,9 +122,7 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		assertEquals(1, campeonatoResponseDto.size());
 	}
 
-	
-	
-	
+
 	@Test
 	@Order(7)
 	@Description("Listar o campeonato pelo nome")
@@ -139,19 +133,18 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		assertEquals(1, campeonatoResponseDto.size());
 	}
-	
-	
-	
+
+
 	@Test
 	@Order(8)
 	@Description("Listar todos os campeonatos ativos")
-	void carregarTodasAsEquipes() {
+	void carregarTodasOsCampçoenatos() {
 		List<CampeonatoResponseDto> campeonatoResponseDto = listarTodosOsCampeonatosAtivos();
 
 		assertEquals(2, campeonatoResponseDto.size());
 	}
-	
-	
+
+
 	@Test
 	@Order(9)
 	@Description("Filtar todos os campeonatos por ID ou Nome")
@@ -163,8 +156,7 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		assertEquals(1, campeonatoResponseDto.size());
 	}
 
-	
-	
+
 	@Test
 	@Order(10)
 	@Description("Excluir o Campeonato id=1")
@@ -173,29 +165,27 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		//Confirmar se o registro foi excluido
 		int statusCode = campeonatoInexistente(campeonatoId);
-		
+
 		assertEquals(404, statusCode);
 	}
+
 
 	@Test
 	@Order(11)
 	@Description("Excluir campeonato id=10 que não existe")
-	void deleteRegistroInexistente() {
+	void deleteCampeonatoInexistente() {
 		int statusCode = campeonatoInexistente(10L);
-		
+
 		assertEquals(404, statusCode);
 	}
-	
-	
 
-	
-	
+
 	private Long criarCampeonato(String nome,String descricao,Boolean ativo) {
 		CampeonatoDto campeonatoDto = new CampeonatoDto();
 		campeonatoDto.setNome(nome);
 		campeonatoDto.setDescricao(descricao);
 		campeonatoDto.setAtivo(ativo);
-		
+
 		campeonatoId = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
@@ -210,7 +200,7 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		return campeonatoId;
 	}
-	
+
 
 	private CampeonatoResponseDto buscarCampeonato(Long id) {
 		CampeonatoResponseDto campeonatoResponseDto = RestAssured.given()
@@ -226,8 +216,8 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		return campeonatoResponseDto;
 	}
-	
-	
+
+
 	private void atualizarCampeonato(Long id,String nome,String descricao,Boolean ativo) {
 		CampeonatoDto campeonatoDto = new CampeonatoDto();
 		campeonatoDto.setNome(nome);
@@ -244,8 +234,8 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
                 .then()
                 .statusCode(200);
 	}
-	
-	
+
+
 	private int atualizarCampeonatoInexistente(Long id,String nome,String descricao,Boolean ativo) {
 		CampeonatoDto campeonatoDto = new CampeonatoDto();
 		campeonatoDto.setNome(nome);
@@ -258,15 +248,13 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
                 .body(campeonatoDto)
                 .when()
                 .put("/campeonato/v1/" + id);
-		
+
 		int statusCode = response.getStatusCode();
-		
+
 		return statusCode;
 	}
-	
-	
-	
-	
+
+
 	private List<CampeonatoResponseDto> listarTodosOsCampeonatos() {
 		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
@@ -281,8 +269,8 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		return campeonatoResponseDto;
 	}
-	
-	
+
+
 	private List<CampeonatoResponseDto> listarTodosOsCampeonatosAtivos() {
 		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
@@ -297,12 +285,8 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		return campeonatoResponseDto;
 	}
-	
-	
-	
 
 
-	
 	private List<CampeonatoResponseDto> listarTodosOsCampeonatosIdMaiorOuIgual(Long id) {
 		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
@@ -317,10 +301,8 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		return campeonatoResponseDto;
 	}
-	
-	
-	
-	
+
+
 	private List<CampeonatoResponseDto> listarTodosOsCampeonatosContemNome(String nome) {
 		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
@@ -336,8 +318,8 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		return campeonatoResponseDto;
 
 	}
-	
-	
+
+
 	private List<CampeonatoResponseDto> filtroPorIdMaiorOuIgual(Long id) {
 		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
@@ -352,9 +334,8 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		return campeonatoResponseDto;
 	}
-	
-	
-	
+
+
 	private List<CampeonatoResponseDto> filtroPorNome(String nome) {
 		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
@@ -369,7 +350,8 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		return campeonatoResponseDto;
 	}
-	
+
+
 	private void excluirCampeonato(Long id) {
 		RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
@@ -379,30 +361,18 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
                 .then()
                 .statusCode(200);
 	}
-	
 
-	
-	
-	
+
 	private int campeonatoInexistente(Long id) {
 		Response response =  RestAssured.given()
         		.header("Authorization", "Bearer " + accessToken)
                 .contentType("application/json")
                 .when()
                 .get("/campeonato/v1/" + id);
-		
+
 		int statusCode = response.getStatusCode();
-		
+
 		return statusCode;
 	}
-	
-	
-	
-	
-
-
-	
-
-
 
 }
