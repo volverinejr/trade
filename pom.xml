@@ -7,7 +7,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.5.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>br.com.claudemirojr.trade</groupId>
 	<artifactId>trade</artifactId>
@@ -33,17 +33,17 @@
 		<modelmapper.version>3.2.0</modelmapper.version>
 	</properties>
 	<dependencies>
-	
+
 		<dependency>
-		    <groupId>org.testcontainers</groupId>
-		    <artifactId>mysql</artifactId>
-		    <scope>test</scope>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>mysql</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
-		    <groupId>com.redis</groupId>
-		    <artifactId>testcontainers-redis</artifactId>
-		    <scope>test</scope>
+			<groupId>com.redis</groupId>
+			<artifactId>testcontainers-redis</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -65,8 +65,8 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
-		
+
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
@@ -77,23 +77,27 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache-->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-cache-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-cache</artifactId>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui-->
+		<!--
+		https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-ui-->
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>${openapi.version}</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-envers -->
+		<!--
+		https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-envers -->
 		<dependency>
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-envers</artifactId>
@@ -104,7 +108,7 @@
 			<artifactId>modelmapper</artifactId>
 			<version>${modelmapper.version}</version>
 		</dependency>
-		
+
 		<!--
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -112,8 +116,8 @@
 			<version>${hibernate-envers.version}</version>
 		</dependency>
 		-->
-		
-		
+
+
 		<!-- Actuator
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -136,28 +140,28 @@
 			<artifactId>zipkin-reporter-brave</artifactId>
 		</dependency>
 		 -->
-		
-		
+
+
 		<!-- AOP -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
-		<!-- junit 5 -->  
+		<!-- junit 5 -->
 		<dependency>
-		    <groupId>org.junit.jupiter</groupId>
-		    <artifactId>junit-jupiter</artifactId>
-		    <scope>test</scope>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- security -->
 		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-security</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
 		</dependency>
 
 		<dependency>
@@ -165,35 +169,32 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
 		<dependency>
-		    <groupId>org.flywaydb</groupId>
-		    <artifactId>flyway-core</artifactId>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>org.flywaydb</groupId>
-		    <artifactId>flyway-mysql</artifactId>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-mysql</artifactId>
 		</dependency>
-		
-		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310  -->
+
+		<!--
+		https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310  -->
 		<dependency>
-		    <groupId>com.fasterxml.jackson.datatype</groupId>
-		    <artifactId>jackson-datatype-jsr310</artifactId>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/io.rest-assured/rest-assured -->
 		<dependency>
-		    <groupId>io.rest-assured</groupId>
-		    <artifactId>rest-assured</artifactId>
-		    <scope>test</scope>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<scope>test</scope>
 		</dependency>
-		
-		
-
-		
-
 	</dependencies>
+
 
 	<build>
 		<plugins>
@@ -201,64 +202,68 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			
-		
-			<plugin>
-			  <groupId>org.jacoco</groupId>
-			  <artifactId>jacoco-maven-plugin</artifactId>
-			  <version>0.8.13</version>
-			  <executions>
-			    <!-- Executa o agente antes dos testes -->
-			    <execution>
-			      <id>prepare-agent</id>
-			      <goals>
-			        <goal>prepare-agent</goal>
-			      </goals>
-			    </execution>
-			
-			    <!-- Gera o relatório HTML (opcional, para visualização) -->
-			    <execution>
-			      <id>report</id>
-			      <phase>verify</phase>
-			      <goals>
-			        <goal>report</goal>
-			      </goals>
-			    </execution>
-			
-			    <!-- Aqui é onde a cobertura mínima é validada de verdade -->
-			    <execution>
-			      <id>check</id>
-			      <phase>verify</phase>
-			      <!--
-			      <goals>
-			        <goal>check</goal>
-			      </goals>
-			      -->
-			      <configuration>
-			        <rules>
-			          <rule>
-			            <element>CLASS</element>
-			            <includes>
-							<include>br/com/claudemirojr/trade/model/service/*</include>
-							<include>br/com/claudemirojr/trade/controller/*</include>
-			             </includes>
-			             <limits>
-				            <limit>
-				              <counter>METHOD</counter>
-				              <value>COVEREDRATIO</value>
-				              <minimum>0.80</minimum> <!-- 80% de cobertura mínima -->
-				            </limit>
-			            </limits>
-			        	<failOnViolation>false</failOnViolation>
-			          </rule>
-			        </rules>
-			      </configuration>
-			    </execution>
 
-			  </executions>
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.11</version>
+				<configuration>
+					<includes>
+						<include>br/com/claudemirojr/trade/controller/*</include>
+						<include>br/com/claudemirojr/trade/model/service/*</include>
+					</includes>
+
+					<excludes>
+						<exclude>br/com/claudemirojr/trade/util/**</exclude>
+						<exclude>br/com/claudemirojr/trade/model/entity/**</exclude>
+						<exclude>br/com/claudemirojr/trade/exception/**</exclude>
+						<exclude>br/com/claudemirojr/trade/converter/**</exclude>
+						<exclude>br/com/claudemirojr/trade/dto/**</exclude>
+					</excludes>
+				</configuration>
+
+				<executions>
+					<execution>
+						<id>prepare-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					
+					<execution>
+					    <id>jacoco-site</id>
+					    <phase>package</phase>
+					    <goals>
+					        <goal>report</goal>
+					    </goals>
+					</execution>					
+
+					<execution>
+					    <id>check-coverage</id>
+					    <phase>verify</phase>
+					    <goals>
+					        <goal>check</goal>
+					    </goals>
+					    <configuration>
+					        <rules>
+					            <rule>
+					                <element>BUNDLE</element>
+					                <limits>
+					                    <limit>
+					                        <counter>INSTRUCTION</counter>
+					                        <value>COVEREDRATIO</value>
+					                        <minimum>0.80</minimum>
+					                    </limit>
+					                </limits>
+					            </rule>
+					        </rules>
+					    </configuration>
+					</execution>
+					
+				</executions>
 			</plugin>
-		
-			
+
 		</plugins>
 	</build>
 
