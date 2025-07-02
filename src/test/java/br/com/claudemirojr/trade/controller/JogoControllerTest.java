@@ -53,9 +53,6 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 
 	private String accessToken;
 	private Long jogoId;
-	private Long campeonatoId;
-	private Integer numeroRodada;
-	private Long equipeId;
 
 	private Campeonato campeonato;
 	private Equipe mandante;
@@ -302,6 +299,72 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 		assertEquals(visitanteId, response.getEquipeVisitante().getId());
 	}
 
+	@Test
+	@Order(14)
+	@Description("Criar um novo jogo com Campeonato Inexistente")
+	void createComCampeonatoInexistente() {
+		Campeonato campeonatoInexistente = new Campeonato();
+		campeonatoInexistente.setId(100L);
+		campeonatoInexistente.setNome(campeonato.getNome());
+		campeonatoInexistente.setDescricao(campeonato.getDescricao());
+		campeonatoInexistente.setAtivo(campeonato.getAtivo());
+		assertNotNull(campeonatoInexistente);
+
+		Integer numeroRodada = 1;
+
+		assertNotNull(mandante);
+		Integer eqpMandantePrimeitoTempoTotalGol = 0;
+		Integer eqpMandantePrimeitoTempoTotalEscanteio = 0;
+		Integer eqpMandanteSegundoTempoTotalGol = 0;
+		Integer eqpMandanteSegundoTempoTotalEscanteio = 0;
+
+		assertNotNull(visitante);
+
+		Integer eqpVisitantePrimeitoTempoTotalGol = 0;
+		Integer eqpVisitantePrimeitoTempoTotalEscanteio = 0;
+		Integer eqpVisitanteSegundoTempoTotalGol = 0;
+		Integer eqpVisitanteSegundoTempoTotalEscanteio = 0;
+
+		int statusCode = criarJogoComError(campeonatoInexistente, numeroRodada, mandante,
+				eqpMandantePrimeitoTempoTotalGol, eqpMandantePrimeitoTempoTotalEscanteio,
+				eqpMandanteSegundoTempoTotalGol, eqpMandanteSegundoTempoTotalEscanteio,
+
+				visitante, eqpVisitantePrimeitoTempoTotalGol, eqpVisitantePrimeitoTempoTotalEscanteio,
+				eqpVisitanteSegundoTempoTotalGol, eqpVisitanteSegundoTempoTotalEscanteio);
+
+		assertEquals(404, statusCode);
+	}
+
+	@Test
+	@Order(15)
+	@Description("Criar um novo jogo com Mandante e Visitante iguais")
+	void createComMandanteeVisitanteIguais() {
+		assertNotNull(campeonato);
+
+		Integer numeroRodada = 1;
+
+		assertNotNull(mandante);
+		Integer eqpMandantePrimeitoTempoTotalGol = 0;
+		Integer eqpMandantePrimeitoTempoTotalEscanteio = 0;
+		Integer eqpMandanteSegundoTempoTotalGol = 0;
+		Integer eqpMandanteSegundoTempoTotalEscanteio = 0;
+
+		Integer eqpVisitantePrimeitoTempoTotalGol = 0;
+		Integer eqpVisitantePrimeitoTempoTotalEscanteio = 0;
+		Integer eqpVisitanteSegundoTempoTotalGol = 0;
+		Integer eqpVisitanteSegundoTempoTotalEscanteio = 0;
+
+		int statusCode = criarJogoComError(campeonato, numeroRodada, mandante, eqpMandantePrimeitoTempoTotalGol,
+				eqpMandantePrimeitoTempoTotalEscanteio, eqpMandanteSegundoTempoTotalGol,
+				eqpMandanteSegundoTempoTotalEscanteio,
+
+				mandante, eqpVisitantePrimeitoTempoTotalGol, eqpVisitantePrimeitoTempoTotalEscanteio,
+				eqpVisitanteSegundoTempoTotalGol, eqpVisitanteSegundoTempoTotalEscanteio);
+
+		assertEquals(400, statusCode);
+
+	}
+
 	private Long criarEquipe(String nome) {
 		EquipeDto equipeDto = new EquipeDto();
 		equipeDto.setNome(nome);
@@ -378,6 +441,42 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 				.jsonPath().getLong("id");
 
 		return jogoId;
+	}
+
+	private int criarJogoComError(Campeonato campeonato, Integer numeroRodada,
+
+			// ===== MANDANTE =====
+			Equipe eqpMandante, Integer eqpMandantePrimeitoTempoTotalGol,
+			Integer eqpMandantePrimeitoTempoTotalEscanteio, Integer eqpMandanteSegundoTempoTotalGol,
+			Integer eqpMandanteSegundoTempoTotalEscanteio,
+
+			// ===== VISITANTE =====
+			Equipe eqpVisitante, Integer eqpVisitantePrimeitoTempoTotalGol,
+			Integer eqpVisitantePrimeitoTempoTotalEscanteio, Integer eqpVisitanteSegundoTempoTotalGol,
+			Integer eqpVisitanteSegundoTempoTotalEscanteio) {
+		JogoDto jogoDto = new JogoDto();
+		jogoDto.setCampeonato(campeonato);
+
+		jogoDto.setNumeroRodada(numeroRodada);
+
+		jogoDto.setEqpMandante(eqpMandante);
+		jogoDto.setEqpMandantePrimeitoTempoTotalGol(eqpMandantePrimeitoTempoTotalGol);
+		jogoDto.setEqpMandantePrimeitoTempoTotalEscanteio(eqpMandantePrimeitoTempoTotalEscanteio);
+		jogoDto.setEqpMandanteSegundoTempoTotalGol(eqpMandantePrimeitoTempoTotalEscanteio);
+		jogoDto.setEqpMandanteSegundoTempoTotalEscanteio(eqpMandanteSegundoTempoTotalEscanteio);
+
+		jogoDto.setEqpVisitante(eqpVisitante);
+		jogoDto.setEqpVisitantePrimeitoTempoTotalGol(eqpVisitantePrimeitoTempoTotalGol);
+		jogoDto.setEqpVisitantePrimeitoTempoTotalEscanteio(eqpVisitantePrimeitoTempoTotalEscanteio);
+		jogoDto.setEqpVisitanteSegundoTempoTotalGol(eqpVisitanteSegundoTempoTotalGol);
+		jogoDto.setEqpVisitanteSegundoTempoTotalEscanteio(eqpVisitanteSegundoTempoTotalEscanteio);
+
+		Response response = RestAssured.given().header("Authorization", "Bearer " + accessToken)
+				.contentType("application/json").body(jogoDto).when().post("/jogo/v1");
+
+		int statusCode = response.getStatusCode();
+
+		return statusCode;
 	}
 
 	private JogoResponseDto buscarJogo(Long id) {
