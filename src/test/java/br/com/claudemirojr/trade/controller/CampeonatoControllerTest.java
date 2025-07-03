@@ -38,7 +38,6 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 	@LocalServerPort
 	private int port;
 
-
 	@BeforeAll
 	void obterToken() {
 		campeonatoRepository.deleteAll();
@@ -49,16 +48,15 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		RestAssured.basePath = "/api/trade";
 	}
 
-
 	@Test
 	@Order(1)
 	@Description("Criar um novo campeonato chamado Premier League 2023/2023")
 	void create() {
-		campeonatoId = criarCampeonato("Premier League 2023/2023","Principal competição de pontos corridos da Inglaterra",true);
+		campeonatoId = criarCampeonato("Premier League 2023/2023",
+				"Principal competição de pontos corridos da Inglaterra", true);
 
 		assertNotNull(campeonatoId);
 	}
-
 
 	@Test
 	@Order(2)
@@ -71,20 +69,19 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		assertEquals(campeonatoEsperado, campeonatoResponseDto.getNome());
 	}
 
-
 	@Test
 	@Order(3)
 	@Description("Atualizar o nome do campeonato para Brasileirão")
 	void update() {
 		String campeonatoModificado = "Brasileirão";
-		atualizarCampeonato(campeonatoId, campeonatoModificado , "Principal competição de pontos corridos do Brasil" , true);
+		atualizarCampeonato(campeonatoId, campeonatoModificado, "Principal competição de pontos corridos do Brasil",
+				true);
 
-		//Confirmar que foi alterado
+		// Confirmar que foi alterado
 		CampeonatoResponseDto campeonatoResponseDto = buscarCampeonato(campeonatoId);
 
 		assertEquals(campeonatoModificado, campeonatoResponseDto.getNome());
 	}
-
 
 	@Test
 	@Order(4)
@@ -92,11 +89,10 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 	void updateCampeonatoInexistente() {
 		String campeonatoModificado = "La liga";
 
-		int statusCode = atualizarCampeonatoInexistente(100L, campeonatoModificado,"Campeonato espanhol",true);
+		int statusCode = atualizarCampeonatoInexistente(100L, campeonatoModificado, "Campeonato espanhol", true);
 
 		assertEquals(404, statusCode);
 	}
-
 
 	@Test
 	@Order(5)
@@ -105,23 +101,23 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		String nome = "Série B";
 		String descricao = "Principal competição de pontos corridos do Brasil";
 		Boolean ativo = true;
-		criarCampeonato(nome,descricao,ativo);
+		criarCampeonato(nome, descricao, ativo);
 
 		List<CampeonatoResponseDto> campeonatoResponseDto = listarTodosOsCampeonatos();
 
 		assertEquals(2, campeonatoResponseDto.size());
 	}
 
-
 	@Test
 	@Order(6)
 	@Description("Listar todos os campeonatos cujo ID >= 2")
 	void findAllIdMaiorIgual() {
-		List<CampeonatoResponseDto> campeonatoResponseDto = listarTodosOsCampeonatosIdMaiorOuIgual(2L);
+		Long ultimoCadastro = campeonatoId + 1;
+
+		List<CampeonatoResponseDto> campeonatoResponseDto = listarTodosOsCampeonatosIdMaiorOuIgual(ultimoCadastro);
 
 		assertEquals(1, campeonatoResponseDto.size());
 	}
-
 
 	@Test
 	@Order(7)
@@ -134,7 +130,6 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		assertEquals(1, campeonatoResponseDto.size());
 	}
 
-
 	@Test
 	@Order(8)
 	@Description("Listar todos os campeonatos ativos")
@@ -143,7 +138,6 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		assertEquals(2, campeonatoResponseDto.size());
 	}
-
 
 	@Test
 	@Order(9)
@@ -156,19 +150,17 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		assertEquals(1, campeonatoResponseDto.size());
 	}
 
-
 	@Test
 	@Order(10)
 	@Description("Excluir o Campeonato id=1")
 	void delete() {
 		excluirCampeonato(campeonatoId);
 
-		//Confirmar se o registro foi excluido
+		// Confirmar se o registro foi excluido
 		int statusCode = campeonatoInexistente(campeonatoId);
 
 		assertEquals(404, statusCode);
 	}
-
 
 	@Test
 	@Order(11)
@@ -179,196 +171,114 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		assertEquals(404, statusCode);
 	}
 
-
-	private Long criarCampeonato(String nome,String descricao,Boolean ativo) {
+	private Long criarCampeonato(String nome, String descricao, Boolean ativo) {
 		CampeonatoDto campeonatoDto = new CampeonatoDto();
 		campeonatoDto.setNome(nome);
 		campeonatoDto.setDescricao(descricao);
 		campeonatoDto.setAtivo(ativo);
 
-		campeonatoId = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .body(campeonatoDto)
-                .when()
-                .post("/campeonato/v1")
-                .then()
-                .statusCode(201)
-                .extract()
-                .jsonPath()
-                .getLong("id");
+		var campeonatoId = RestAssured.given().header("Authorization", "Bearer " + accessToken)
+				.contentType("application/json").body(campeonatoDto).when().post("/campeonato/v1").then()
+				.statusCode(201).extract().jsonPath().getLong("id");
 
 		return campeonatoId;
 	}
 
-
 	private CampeonatoResponseDto buscarCampeonato(Long id) {
 		CampeonatoResponseDto campeonatoResponseDto = RestAssured.given()
-				.header("Authorization", "Bearer " + accessToken)
-			    .contentType("application/json")
-			    .when()
-			    .get("/campeonato/v1/" + id)
-			    .then()
-			    .statusCode(200)
-			    .extract()
-			    .as(CampeonatoResponseDto.class);
-
+				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
+				.get("/campeonato/v1/" + id).then().statusCode(200).extract().as(CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 	}
 
-
-	private void atualizarCampeonato(Long id,String nome,String descricao,Boolean ativo) {
+	private void atualizarCampeonato(Long id, String nome, String descricao, Boolean ativo) {
 		CampeonatoDto campeonatoDto = new CampeonatoDto();
 		campeonatoDto.setNome(nome);
 		campeonatoDto.setDescricao(descricao);
 		campeonatoDto.setAtivo(ativo);
 
-
-		RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .body(campeonatoDto)
-                .when()
-                .put("/campeonato/v1/" + campeonatoId)
-                .then()
-                .statusCode(200);
+		RestAssured.given().header("Authorization", "Bearer " + accessToken).contentType("application/json")
+				.body(campeonatoDto).when().put("/campeonato/v1/" + campeonatoId).then().statusCode(200);
 	}
 
-
-	private int atualizarCampeonatoInexistente(Long id,String nome,String descricao,Boolean ativo) {
+	private int atualizarCampeonatoInexistente(Long id, String nome, String descricao, Boolean ativo) {
 		CampeonatoDto campeonatoDto = new CampeonatoDto();
 		campeonatoDto.setNome(nome);
 		campeonatoDto.setDescricao(descricao);
 		campeonatoDto.setAtivo(ativo);
 
-		Response response = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .body(campeonatoDto)
-                .when()
-                .put("/campeonato/v1/" + id);
+		Response response = RestAssured.given().header("Authorization", "Bearer " + accessToken)
+				.contentType("application/json").body(campeonatoDto).when().put("/campeonato/v1/" + id);
 
 		int statusCode = response.getStatusCode();
 
 		return statusCode;
 	}
 
-
 	private List<CampeonatoResponseDto> listarTodosOsCampeonatos() {
 		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/campeonato/v1")
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getList("content", CampeonatoResponseDto.class);
+				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
+				.get("/campeonato/v1").then().statusCode(200).extract().jsonPath()
+				.getList("content", CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 	}
-
 
 	private List<CampeonatoResponseDto> listarTodosOsCampeonatosAtivos() {
 		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/campeonato/v1/search-ativo")
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getList("content", CampeonatoResponseDto.class);
+				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
+				.get("/campeonato/v1/search-ativo").then().statusCode(200).extract().jsonPath()
+				.getList("content", CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 	}
-
 
 	private List<CampeonatoResponseDto> listarTodosOsCampeonatosIdMaiorOuIgual(Long id) {
 		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/campeonato/v1/search-id-maior-igual/" + id)
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getList("content", CampeonatoResponseDto.class);
+				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
+				.get("/campeonato/v1/search-id-maior-igual/" + id).then().statusCode(200).extract().jsonPath()
+				.getList("content", CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 	}
-
 
 	private List<CampeonatoResponseDto> listarTodosOsCampeonatosContemNome(String nome) {
 		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/campeonato/v1/search-nome/" + nome)
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getList("content", CampeonatoResponseDto.class);
+				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
+				.get("/campeonato/v1/search-nome/" + nome).then().statusCode(200).extract().jsonPath()
+				.getList("content", CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 
 	}
-
 
 	private List<CampeonatoResponseDto> filtroPorIdMaiorOuIgual(Long id) {
 		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/campeonato/v1/filter/" + id)
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getList("content", CampeonatoResponseDto.class);
+				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
+				.get("/campeonato/v1/filter/" + id).then().statusCode(200).extract().jsonPath()
+				.getList("content", CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 	}
-
 
 	private List<CampeonatoResponseDto> filtroPorNome(String nome) {
 		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/campeonato/v1/filter/" + nome)
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getList("content", CampeonatoResponseDto.class);
+				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
+				.get("/campeonato/v1/filter/" + nome).then().statusCode(200).extract().jsonPath()
+				.getList("content", CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 	}
 
-
 	private void excluirCampeonato(Long id) {
-		RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .delete("/campeonato/v1/" + id)
-                .then()
-                .statusCode(200);
+		RestAssured.given().header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
+				.delete("/campeonato/v1/" + id).then().statusCode(200);
 	}
 
-
 	private int campeonatoInexistente(Long id) {
-		Response response =  RestAssured.given()
-        		.header("Authorization", "Bearer " + accessToken)
-                .contentType("application/json")
-                .when()
-                .get("/campeonato/v1/" + id);
+		Response response = RestAssured.given().header("Authorization", "Bearer " + accessToken)
+				.contentType("application/json").when().get("/campeonato/v1/" + id);
 
 		int statusCode = response.getStatusCode();
 
