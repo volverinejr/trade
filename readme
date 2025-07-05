@@ -1,0 +1,12 @@
+
+Summary of actions:
+- A new branch 'release/add_inf' was created, based on 'develop'
+- You are now on branch 'release/add_inf'
+
+Follow-up actions:
+- Bump the version number now!
+- Start committing last-minute fixes in preparing your release
+- When done, run:
+
+     git flow release finish 'add_inf'
+
