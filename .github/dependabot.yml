@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/" # raiz do projeto
+    schedule:
+      interval: "weekly" # ou "daily", "monthly"
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "org.springframework.boot"
+        versions: ["3.x"] # exemplo: ignorar versões maiores
