@@ -1,6 +1,6 @@
 ## CI Status
 
-[![Build & Security Check](https://github.com/claudemirojr/trade/actions/workflows/CI.yml/badge.svg)](https://github.com/claudemirojr/trade/actions)
+[![Build & Security Check](https://github.com/volverinejr/trade/actions/workflows/CI.yml/badge.svg)](https://github.com/volverinejr/trade/actions)
 
 ## CodeCov
 
