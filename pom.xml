@@ -202,6 +202,19 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			
+			
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>8.4.0</version>
+				<configuration>
+					<failBuildOnCVSS>7.0</failBuildOnCVSS> <!-- ⚠️ build falha se CVSS >= 7.0 -->
+					<format>HTML</format>
+					<outputDirectory>${project.build.directory}</outputDirectory>
+				</configuration>				
+			</plugin>
+			
 
 
 			<plugin>

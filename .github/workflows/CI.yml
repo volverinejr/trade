@@ -49,16 +49,19 @@ jobs:
           verbose: true
           plugins: github-pr-comment
 
-      - name: Verificação de Vulnerabilidades (OWASP Dependency Check)
-        uses: dependency-check/Dependency-Check_Action@v2.0.3
-        with:
-          project: "trade"
-          path: "."
-          format: "HTML"
-          failOnCVSS: 7.0 # falha o build se houver CVE crítica (7+)
+#- name: Verificação de Vulnerabilidades (OWASP Dependency Check)
+#  uses: dependency-check/Dependency-Check_Action@v2.0.3
+#  with:
+#    project: "trade"
+#    path: "."
+#    format: "HTML"
+#    failOnCVSS: 7.0 # falha o build se houver CVE crítica (7+)
+
+      - name: Verificar vulnerabilidades com OWASP (via Maven)
+        run: mvn org.owasp:dependency-check-maven:check
 
       - name: Publicar relatório OWASP
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
           path: dependency-check-report.html
