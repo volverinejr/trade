@@ -81,4 +81,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGEM_NAME }}:${{ steps.tagging.outputs.new_version }}, ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGEM_NAME }}:latest
 
+      - name: Avisar localização do relatório
+        run: echo "✅ Relatório de vulnerabilidades disponível em: Actions → Run → Artifacts → dependency-check-report"
+
 
