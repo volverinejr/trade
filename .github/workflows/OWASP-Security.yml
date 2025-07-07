@@ -1,0 +1,38 @@
+name: Análise de Segurança com OWASP
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'  # toda segunda-feira às 03:00 UTC
+  pull_request:
+    branches: [main]
+
+jobs:
+  owasp-security-scan:
+    name: Verificar vulnerabilidades com OWASP
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - name: Cache da base OWASP
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/owasp/dependency-check-data
+          key: owasp-cache-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+
+      - name: Verificar vulnerabilidades com OWASP (via Maven)
+        run: mvn org.owasp:dependency-check-maven:check
+
+      - name: Publicar relatório OWASP
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: target/dependency-check-report.html
