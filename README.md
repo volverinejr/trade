@@ -2,7 +2,7 @@
 
 [![Entrega - OWASP Dependency Check](https://github.com/volverinejr/trade/actions/workflows/CI.yml/badge.svg)](https://github.com/volverinejr/trade/actions/workflows/CI.yml)
 [![codecov](https://codecov.io/gh/volverinejr/trade/graph/badge.svg?token=IX01AUR2EG)](https://codecov.io/gh/volverinejr/trade)
-![Java](https://img.shields.io/badge/Java-17-blue.svg)
+![Java](https://img.shields.io/badge/Java-21-blue.svg)
 ![Build Time](https://img.shields.io/badge/Build~Time-~1~min-brightgreen)
 
 
@@ -17,7 +17,7 @@ Este projeto possui testes automatizados de integração e API com cobertura, se
 
 ### ✔️ Pré-requisitos
 
-- Java 17+
+- Java 21+
 - Maven 3.8+
 - Docker (necessário para Testcontainers)
 
