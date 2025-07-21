@@ -1,21 +1,21 @@
 # Etapa 1: Build
-FROM bellsoft/liberica-openjdk-alpine:21.0.1 as builder
+FROM bellsoft/liberica-openjdk-alpine:21.0.1 AS builder
 ARG JAR_FILE=target/trade-0.0.1-SNAPSHOT.jar
 WORKDIR /app
 COPY ${JAR_FILE} app.jar
 
 
 # Etapa 2: Runtime
-FROM bellsoft/liberica-runtime-container:jre-slim-musl as final
+FROM bellsoft/liberica-runtime-container:jre-slim-musl AS final
 
 # Criar usuário não-root
 RUN adduser --system --home /app --shell /bin/sh appuser
 
 WORKDIR /app
-COPY --from=builder /app/app.jar app.jar
+COPY --from=builder --chown=appuser:appuser /app/app.jar app.jar
 
 # Mudar dono dos arquivos para o novo usuário (se necessário)
-RUN chown -R appuser:appuser /app
+# RUN chown -R appuser:appuser /app
 
 USER appuser
 
