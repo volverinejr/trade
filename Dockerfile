@@ -9,7 +9,8 @@ COPY ${JAR_FILE} app.jar
 FROM bellsoft/liberica-runtime-container:jre-slim-musl AS final
 
 # Criar usuário não-root
-RUN adduser --system --home /app --shell /bin/sh appuser
+RUN adduser --uid 1000 --system --home /app --shell /bin/sh appuser
+
 
 WORKDIR /app
 COPY --from=builder --chown=appuser:appuser /app/app.jar app.jar
