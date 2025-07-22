@@ -17,9 +17,11 @@ public class AuthUtil {
 
         String username = System.getenv("TEST_USERNAME");
         String password = System.getenv("TEST_PASSWORD");
+        String redis = System.getenv("REDIS_HOST");
+        
 
-        if (username == null || password == null) {
-            throw new IllegalStateException("Variáveis de ambiente TEST_USERNAME e TEST_PASSWORD devem estar definidas.");
+        if (username == null || password == null || redis == null ) {
+            throw new IllegalStateException("Variáveis de ambiente TEST_USERNAME, TEST_PASSWORD e REDIS_HOST devem estar definidas.");
         }
 
         String url = "https://grapp.tec.br/newapi/token";

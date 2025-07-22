@@ -11,29 +11,33 @@ import org.springframework.data.redis.serializer.RedisSerializationContext.Seria
 
 @Configuration
 public class CacheConfig {
+	
+	private static final Duration DEFAULT_TTL = Duration.ofMinutes(60);
+	private static final Duration SHORT_TTL = Duration.ofMinutes(3);
+	private static final Duration MEDIUM_TTL = Duration.ofMinutes(5);	
 
 	@Bean
 	RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer() {
 		return (builder) -> builder
 				.withCacheConfiguration("trade_campeonatoCache",
-						RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(3)))
+						RedisCacheConfiguration.defaultCacheConfig().entryTtl(SHORT_TTL))
 
 				.withCacheConfiguration("trade_equipeCache",
-						RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(3)))
+						RedisCacheConfiguration.defaultCacheConfig().entryTtl(SHORT_TTL))
 
 				.withCacheConfiguration("trade_jogoCache",
-						RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(3)))
+						RedisCacheConfiguration.defaultCacheConfig().entryTtl(SHORT_TTL))
 
 				.withCacheConfiguration("trade_jogoAnaliseMandanteVisitanteCache",
-						RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(3)))
+						RedisCacheConfiguration.defaultCacheConfig().entryTtl(SHORT_TTL))
 
 				.withCacheConfiguration("customerCache",
-						RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(5)));
+						RedisCacheConfiguration.defaultCacheConfig().entryTtl(MEDIUM_TTL));
 	}
 
 	@Bean
 	RedisCacheConfiguration cacheConfiguration() {
-		return RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(60)).disableCachingNullValues()
+		return RedisCacheConfiguration.defaultCacheConfig().entryTtl(DEFAULT_TTL).disableCachingNullValues()
 				.serializeValuesWith(SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 	}
 

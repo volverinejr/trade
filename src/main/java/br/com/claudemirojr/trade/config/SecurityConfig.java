@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -24,10 +23,12 @@ public class SecurityConfig {
 
 	@Value("${jwt.public.key}")
 	private RSAPublicKey publicKey;
+	
+	private final String[] END_POINTS_PUBLICO = { "/newapi/token", "/health", "/docs/**" };
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.POST, "/newapi/token").permitAll()
+		http.authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.POST, END_POINTS_PUBLICO).permitAll()
 				.anyRequest().authenticated()).csrf(csrf -> csrf.disable())
 				.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -41,8 +42,11 @@ public class SecurityConfig {
 	}
 
 	public static String getUsuarioLogado() {
-		SecurityContext securityContext = SecurityContextHolder.getContext();
-		return securityContext.getAuthentication().getName();
+		var auth = SecurityContextHolder.getContext().getAuthentication();
+		return (auth != null && auth.isAuthenticated()) ? auth.getName() : null;
+		    
+		//SecurityContext securityContext = SecurityContextHolder.getContext();
+		//return securityContext.getAuthentication().getName();
 	}
 
 }
