@@ -15,9 +15,6 @@ RUN adduser --uid 1000 --system --home /app --shell /bin/sh appuser
 WORKDIR /app
 COPY --from=builder --chown=appuser:appuser /app/app.jar app.jar
 
-# Mudar dono dos arquivos para o novo usuário (se necessário)
-# RUN chown -R appuser:appuser /app
-
 USER appuser
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
