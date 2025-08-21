@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.claudemirojr.trade.converter.CampeonatoMapper;
+import br.com.claudemirojr.trade.converter.CampeonatoMapConverter;
 import br.com.claudemirojr.trade.dto.CampeonatoDto;
 import br.com.claudemirojr.trade.dto.CampeonatoResponseDto;
 import br.com.claudemirojr.trade.exception.ResourceNotFoundException;
@@ -29,19 +29,19 @@ public class CampeonatoServiceImpl implements CampeonatoService {
 	private Paginacao paginacao;
 	
 	@Autowired
-	private CampeonatoMapper campeonatoMapper;
+	private CampeonatoMapConverter campeonatoMapConverter;
 
 	public String MSG_ENTIDADE_NAO_EXISTE = "Campeonato não encontrado para id %d";
 
 	private CampeonatoResponseDto convertToCampeonatoResponseDto(Campeonato entity) {
-		return campeonatoMapper.toResponseDto(entity);
+		return campeonatoMapConverter.toResponseDto(entity);
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	@CacheEvict(value = "trade_campeonatoCache", allEntries = true)
 	public CampeonatoResponseDto criar(CampeonatoDto campeonatoCriarDto) {
-		var entity = campeonatoMapper.toCampeonato(campeonatoCriarDto);
+		var entity = campeonatoMapConverter.toCampeonato(campeonatoCriarDto);
 
 		var campeonato = campeonatoRepository.save(entity);
 
