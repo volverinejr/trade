@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.claudemirojr.trade.converter.ModelMaperConverter;
+import br.com.claudemirojr.trade.converter.EquipeMapConverter;
 import br.com.claudemirojr.trade.dto.EquipeDto;
 import br.com.claudemirojr.trade.dto.EquipeResponseDto;
 import br.com.claudemirojr.trade.exception.ResourceNotFoundException;
@@ -27,18 +27,23 @@ public class EquipeServiceImpl implements EquipeService {
 	
 	@Autowired
 	private Paginacao paginacao;
+	
+	@Autowired
+	private EquipeMapConverter equipeMapConverter;
+	
+	
 
 	public String MSG_ENTIDADE_NAO_EXISTE = "Equipe não encontrada para id %d";
 
-	private EquipeResponseDto convertToEquipeResponseDto(Equipe entity) {
-		return ModelMaperConverter.parseObject(entity, EquipeResponseDto.class);
+	private EquipeResponseDto convertToEquipeResponseDto(Equipe equipe) {
+		return equipeMapConverter.toResponseDto(equipe);
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	@CacheEvict(value = "trade_equipeCache", allEntries = true)
 	public EquipeResponseDto criar(EquipeDto equipeCriarDto) {
-		var entity = ModelMaperConverter.parseObject(equipeCriarDto, Equipe.class);
+		var entity = equipeMapConverter.toEquipe(equipeCriarDto);
 
 		var equipe = equipeRepository.save(entity);
 
@@ -130,7 +135,6 @@ public class EquipeServiceImpl implements EquipeService {
 		Page<Equipe> page;
 		
 		if(paginacao.isStringNumeric(valor))
-			
 			page = equipeRepository.findByIdGreaterThanEqual(Long.parseLong(valor), pageable);
 		else {
 			page= equipeRepository.findByNomeIgnoreCaseContaining(valor, pageable);
