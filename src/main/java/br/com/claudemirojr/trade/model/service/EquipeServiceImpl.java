@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.claudemirojr.trade.converter.EquipeMapper;
+import br.com.claudemirojr.trade.converter.EquipeMapConverter;
 import br.com.claudemirojr.trade.dto.EquipeDto;
 import br.com.claudemirojr.trade.dto.EquipeResponseDto;
 import br.com.claudemirojr.trade.exception.ResourceNotFoundException;
@@ -29,21 +29,21 @@ public class EquipeServiceImpl implements EquipeService {
 	private Paginacao paginacao;
 	
 	@Autowired
-	private EquipeMapper equipeMapper;
+	private EquipeMapConverter equipeMapConverter;
 	
 	
 
 	public String MSG_ENTIDADE_NAO_EXISTE = "Equipe não encontrada para id %d";
 
 	private EquipeResponseDto convertToEquipeResponseDto(Equipe equipe) {
-		return equipeMapper.toResponseDto(equipe);
+		return equipeMapConverter.toResponseDto(equipe);
 	}
 
 	@Override
 	@Transactional(readOnly = false)
 	@CacheEvict(value = "trade_equipeCache", allEntries = true)
 	public EquipeResponseDto criar(EquipeDto equipeCriarDto) {
-		var entity = equipeMapper.toEquipe(equipeCriarDto);
+		var entity = equipeMapConverter.toEquipe(equipeCriarDto);
 
 		var equipe = equipeRepository.save(entity);
 

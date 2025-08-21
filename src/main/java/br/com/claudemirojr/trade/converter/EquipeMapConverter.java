@@ -7,7 +7,7 @@ import br.com.claudemirojr.trade.dto.EquipeResponseDto;
 import br.com.claudemirojr.trade.model.entity.Equipe;
 
 @Mapper(componentModel = "spring")
-public interface EquipeMapper {
+public interface EquipeMapConverter {
 	EquipeDto toDto(Equipe equipe);
 	
 	Equipe toEquipe(EquipeDto equipeDto);
