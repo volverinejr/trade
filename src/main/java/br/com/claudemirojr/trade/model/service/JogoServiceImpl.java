@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.claudemirojr.trade.converter.ModelMaperConverter;
+import br.com.claudemirojr.trade.converter.JogoMapper;
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseDto;
 import br.com.claudemirojr.trade.dto.JogoAnaliseResponseEquipeDto;
 import br.com.claudemirojr.trade.dto.JogoDadosResponseDto;
@@ -41,6 +41,9 @@ public class JogoServiceImpl implements JogoService {
 	
 	@Autowired
 	private Paginacao paginacao;
+	
+	@Autowired
+	private JogoMapper jogoMapper;
 
 	private final String MSG_ENTIDADE_NAO_EXISTE = "Jogo não encontrado para id %d";
 	private final String MSG_CAMPEONATO_NAO_EXISTE = "Campeonato não encontrado para id %d";
@@ -52,7 +55,8 @@ public class JogoServiceImpl implements JogoService {
 
 	
 	private JogoResponseDto convertToJogoResponseDto(Jogo entity) {
-		return ModelMaperConverter.parseObject(entity, JogoResponseDto.class);
+		return jogoMapper.toResponseDto(entity);
+		//return ModelMaperConverter.parseObject(entity, JogoResponseDto.class);
 	}
 
 	@Override

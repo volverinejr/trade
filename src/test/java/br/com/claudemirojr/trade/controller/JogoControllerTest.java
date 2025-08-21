@@ -17,7 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Description;
 
-import br.com.claudemirojr.trade.converter.ModelMaperConverter;
+import br.com.claudemirojr.trade.converter.CampeonatoMapper;
+import br.com.claudemirojr.trade.converter.EquipeMapper;
 import br.com.claudemirojr.trade.dto.CampeonatoDto;
 import br.com.claudemirojr.trade.dto.CampeonatoResponseDto;
 import br.com.claudemirojr.trade.dto.EquipeDto;
@@ -50,6 +51,12 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 
 	@Autowired
 	private CampeonatoRepository campeonatoRepository;
+	
+	@Autowired
+	private CampeonatoMapper campeonatoMapper;
+	
+	@Autowired
+	private EquipeMapper equipeMapper;
 
 	private String accessToken;
 	private Long jogoId;
@@ -82,14 +89,16 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 		var campeonatoId = criarCampeonato("Brasileirão série A 2025");
 		CampeonatoResponseDto campeonatoResponse = buscarCampeonato(campeonatoId);
 		assertNotNull(campeonatoResponse);
-		campeonato = ModelMaperConverter.parseObject(campeonatoResponse, Campeonato.class);
+		//campeonato = ModelMaperConverter.parseObject(campeonatoResponse, Campeonato.class);
+		campeonato = campeonatoMapper.toCampeonato(campeonatoResponse);
 
 		Integer numeroRodada = 1;
 
 		var equipeId = criarEquipe("Bahia");
 		EquipeResponseDto eqpMandante = buscarEquipe(equipeId);
 		assertNotNull(eqpMandante);
-		mandante = ModelMaperConverter.parseObject(eqpMandante, Equipe.class);
+		//mandante = ModelMaperConverter.parseObject(eqpMandante, Equipe.class);
+		mandante = equipeMapper.toEquipe(eqpMandante);
 
 		Integer eqpMandantePrimeitoTempoTotalGol = 0;
 		Integer eqpMandantePrimeitoTempoTotalEscanteio = 0;
@@ -99,7 +108,8 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 		equipeId = criarEquipe("Vicetoria");
 		EquipeResponseDto eqpVisitante = buscarEquipe(equipeId);
 		assertNotNull(eqpVisitante);
-		visitante = ModelMaperConverter.parseObject(eqpVisitante, Equipe.class);
+		//visitante = ModelMaperConverter.parseObject(eqpVisitante, Equipe.class);
+		visitante = equipeMapper.toEquipe(eqpVisitante);
 
 		Integer eqpVisitantePrimeitoTempoTotalGol = 0;
 		Integer eqpVisitantePrimeitoTempoTotalEscanteio = 0;
@@ -136,7 +146,8 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 		var equipeId = criarEquipe("Fortaleza");
 		EquipeResponseDto eqpMandante = buscarEquipe(equipeId);
 		assertNotNull(eqpMandante);
-		mandante = ModelMaperConverter.parseObject(eqpMandante, Equipe.class);
+		//mandante = ModelMaperConverter.parseObject(eqpMandante, Equipe.class);
+		equipeMapper.toDto(mandante);
 
 		Integer eqpMandantePrimeitoTempoTotalGol = 1;
 		Integer eqpMandantePrimeitoTempoTotalEscanteio = 1;
@@ -146,7 +157,8 @@ class JogoControllerTest extends AplicacaoStartTestContainer {
 		equipeId = criarEquipe("Ceará");
 		EquipeResponseDto eqpVisitante = buscarEquipe(equipeId);
 		assertNotNull(eqpVisitante);
-		visitante = ModelMaperConverter.parseObject(eqpVisitante, Equipe.class);
+		//visitante = ModelMaperConverter.parseObject(eqpVisitante, Equipe.class);
+		equipeMapper.toDto(visitante);
 
 		Integer eqpVisitantePrimeitoTempoTotalGol = 2;
 		Integer eqpVisitantePrimeitoTempoTotalEscanteio = 2;

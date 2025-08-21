@@ -11,6 +11,8 @@ public interface EquipeMapper {
 	EquipeDto toDto(Equipe equipe);
 	
 	Equipe toEquipe(EquipeDto equipeDto);
-	
+		
+	Equipe toEquipe(EquipeResponseDto equipeResponseDto);
+
 	EquipeResponseDto toResponseDto(Equipe equipe);
 }
