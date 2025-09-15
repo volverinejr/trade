@@ -1,5 +1,6 @@
 package br.com.claudemirojr.trade.controller;
 
+import static io.restassured.RestAssured.given;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -22,7 +23,10 @@ import br.com.claudemirojr.trade.model.repository.CampeonatoRepository;
 import br.com.claudemirojr.trade.testcontainer.AplicacaoStartTestContainer;
 import br.com.claudemirojr.trade.util.AuthUtil;
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -46,7 +50,17 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 
 		RestAssured.port = port;
 		RestAssured.basePath = "/api/trade";
+		
+		// Define uma especificação padrão
+		RestAssured.requestSpecification = new RequestSpecBuilder()
+	            .setContentType(ContentType.JSON)
+	            .addHeader("Authorization", "Bearer " + accessToken)
+	            .build();		
 	}
+	
+	
+	
+	
 
 	@Test
 	@Order(1)
@@ -177,17 +191,21 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		campeonatoDto.setDescricao(descricao);
 		campeonatoDto.setAtivo(ativo);
 
-		var campeonatoId = RestAssured.given().header("Authorization", "Bearer " + accessToken)
-				.contentType("application/json").body(campeonatoDto).when().post("/campeonato/v1").then()
-				.statusCode(201).extract().jsonPath().getLong("id");
+		var campeonatoId = given()
+					.body(campeonatoDto)
+					.when()
+						.post("/campeonato/v1")
+					.then()
+						.statusCode(201).extract().jsonPath().getLong("id");
 
 		return campeonatoId;
 	}
 
 	private CampeonatoResponseDto buscarCampeonato(Long id) {
-		CampeonatoResponseDto campeonatoResponseDto = RestAssured.given()
-				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
-				.get("/campeonato/v1/" + id).then().statusCode(200).extract().as(CampeonatoResponseDto.class);
+		CampeonatoResponseDto campeonatoResponseDto = given()
+				.when()
+				.get("/campeonato/v1/" + id)
+					.then().statusCode(200).extract().as(CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 	}
@@ -198,8 +216,10 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		campeonatoDto.setDescricao(descricao);
 		campeonatoDto.setAtivo(ativo);
 
-		RestAssured.given().header("Authorization", "Bearer " + accessToken).contentType("application/json")
-				.body(campeonatoDto).when().put("/campeonato/v1/" + campeonatoId).then().statusCode(200);
+		given()
+			.body(campeonatoDto)
+			.when().put("/campeonato/v1/" + campeonatoId)
+				.then().statusCode(200);
 	}
 
 	private int atualizarCampeonatoInexistente(Long id, String nome, String descricao, Boolean ativo) {
@@ -208,8 +228,9 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 		campeonatoDto.setDescricao(descricao);
 		campeonatoDto.setAtivo(ativo);
 
-		Response response = RestAssured.given().header("Authorization", "Bearer " + accessToken)
-				.contentType("application/json").body(campeonatoDto).when().put("/campeonato/v1/" + id);
+		Response response = given()
+					.body(campeonatoDto)
+					.when().put("/campeonato/v1/" + id);
 
 		int statusCode = response.getStatusCode();
 
@@ -217,68 +238,76 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 	}
 
 	private List<CampeonatoResponseDto> listarTodosOsCampeonatos() {
-		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
-				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
-				.get("/campeonato/v1").then().statusCode(200).extract().jsonPath()
-				.getList("content", CampeonatoResponseDto.class);
+		List<CampeonatoResponseDto> campeonatoResponseDto = given()
+				.when()
+				.get("/campeonato/v1")
+					.then().statusCode(200).extract().jsonPath()
+					.getList("content", CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 	}
 
 	private List<CampeonatoResponseDto> listarTodosOsCampeonatosAtivos() {
-		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
-				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
-				.get("/campeonato/v1/search-ativo").then().statusCode(200).extract().jsonPath()
-				.getList("content", CampeonatoResponseDto.class);
+		List<CampeonatoResponseDto> campeonatoResponseDto = given()
+				.get("/campeonato/v1/search-ativo")
+					.then().statusCode(200).extract().jsonPath()
+					.getList("content", CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 	}
 
 	private List<CampeonatoResponseDto> listarTodosOsCampeonatosIdMaiorOuIgual(Long id) {
-		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
-				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
-				.get("/campeonato/v1/search-id-maior-igual/" + id).then().statusCode(200).extract().jsonPath()
-				.getList("content", CampeonatoResponseDto.class);
+		List<CampeonatoResponseDto> campeonatoResponseDto = given()
+				.when()
+				.get("/campeonato/v1/search-id-maior-igual/" + id)
+					.then().statusCode(200).extract().jsonPath()
+					.getList("content", CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 	}
 
 	private List<CampeonatoResponseDto> listarTodosOsCampeonatosContemNome(String nome) {
-		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
-				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
-				.get("/campeonato/v1/search-nome/" + nome).then().statusCode(200).extract().jsonPath()
-				.getList("content", CampeonatoResponseDto.class);
+		List<CampeonatoResponseDto> campeonatoResponseDto = given()
+				.when()
+				.get("/campeonato/v1/search-nome/" + nome)
+					.then().statusCode(200).extract().jsonPath()
+					.getList("content", CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 
 	}
 
 	private List<CampeonatoResponseDto> filtroPorIdMaiorOuIgual(Long id) {
-		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
-				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
-				.get("/campeonato/v1/filter/" + id).then().statusCode(200).extract().jsonPath()
-				.getList("content", CampeonatoResponseDto.class);
+		List<CampeonatoResponseDto> campeonatoResponseDto = given()
+				.when()
+				.get("/campeonato/v1/filter/" + id)
+					.then().statusCode(200).extract().jsonPath()
+					.getList("content", CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 	}
 
 	private List<CampeonatoResponseDto> filtroPorNome(String nome) {
-		List<CampeonatoResponseDto> campeonatoResponseDto = RestAssured.given()
-				.header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
-				.get("/campeonato/v1/filter/" + nome).then().statusCode(200).extract().jsonPath()
-				.getList("content", CampeonatoResponseDto.class);
+		List<CampeonatoResponseDto> campeonatoResponseDto = given()
+				.when()
+				.get("/campeonato/v1/filter/" + nome)
+					.then().statusCode(200).extract().jsonPath()
+					.getList("content", CampeonatoResponseDto.class);
 
 		return campeonatoResponseDto;
 	}
 
 	private void excluirCampeonato(Long id) {
-		RestAssured.given().header("Authorization", "Bearer " + accessToken).contentType("application/json").when()
-				.delete("/campeonato/v1/" + id).then().statusCode(200);
+		given()
+				.when()
+				.delete("/campeonato/v1/" + id)
+					.then().statusCode(200);
 	}
 
 	private int campeonatoInexistente(Long id) {
-		Response response = RestAssured.given().header("Authorization", "Bearer " + accessToken)
-				.contentType("application/json").when().get("/campeonato/v1/" + id);
+		Response response = given()
+				.when()
+				.get("/campeonato/v1/" + id);
 
 		int statusCode = response.getStatusCode();
 
