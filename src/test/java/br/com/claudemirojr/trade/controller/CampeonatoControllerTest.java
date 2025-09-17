@@ -1,12 +1,13 @@
 package br.com.claudemirojr.trade.controller;
 
-import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -15,17 +16,16 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Description;
 
 import br.com.claudemirojr.trade.dto.CampeonatoDto;
 import br.com.claudemirojr.trade.dto.CampeonatoResponseDto;
 import br.com.claudemirojr.trade.model.repository.CampeonatoRepository;
 import br.com.claudemirojr.trade.testcontainer.AplicacaoStartTestContainer;
+import br.com.claudemirojr.trade.util.ApiRequestBuilder;
 import br.com.claudemirojr.trade.util.AuthUtil;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -43,7 +43,7 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 	private int port;
 
 	@BeforeAll
-	void obterToken() {
+	void setup() {
 		campeonatoRepository.deleteAll();
 
 		accessToken = AuthUtil.obterToken();
@@ -58,260 +58,207 @@ class CampeonatoControllerTest extends AplicacaoStartTestContainer {
 	            .build();		
 	}
 	
-	
-	
-	
 
 	@Test
 	@Order(1)
-	@Description("Criar um novo campeonato chamado Premier League 2023/2023")
-	void create() {
-		campeonatoId = criarCampeonato("Premier League 2023/2023",
-				"Principal competição de pontos corridos da Inglaterra", true);
-
+	@DisplayName("Criar um novo campeonato chamado [Premier League 2023/2023]")
+	void deveCriarCampeonatoComSucesso() {
+		CampeonatoDto campeonatoDto = new CampeonatoDto(
+				"Premier League 2023/2023",
+				"Principal competição de pontos corridos da Inglaterra", 
+				true);
+		
+        var response = new ApiRequestBuilder()
+                .url("/campeonato/v1")
+                .method("POST")
+                .body(campeonatoDto)
+                .execute();	
+        
+        response.then()
+        	.statusCode(201)
+        	.body("nome", equalTo("Premier League 2023/2023"));      
+        
+        campeonatoId = response.jsonPath().getLong("id");
 		assertNotNull(campeonatoId);
+		
+		
+		/*
+		CampeonatoResponseDto dto = response.then()
+		        .statusCode(201)
+		        .extract()
+		        .as(CampeonatoResponseDto.class);
+
+		    assertEquals("Brasileirão 2025", dto.getNome());
+		    assertEquals(2025, dto.getEdicao());
+		    assertNotNull(dto.getId()); // já valida que veio um id
+		*/
 	}
 
 	@Test
 	@Order(2)
-	@Description("Buscar campeonato criado por ID e validar nome")
-	void findByAuditId() {
-		String campeonatoEsperado = "Premier League 2023/2023";
-
-		CampeonatoResponseDto campeonatoResponseDto = buscarCampeonato(campeonatoId);
-
-		assertEquals(campeonatoEsperado, campeonatoResponseDto.getNome());
+	@DisplayName("Buscar campeonato criado por [ID e validar nome]")
+	void deveBuscarCampeonatoPeloIdValidarNome() {
+        var response = new ApiRequestBuilder()
+                .url("/campeonato/v1/" + campeonatoId)
+                .execute();			
+		
+		
+        response.then()
+    	.statusCode(200)
+    	.body("nome", equalTo("Premier League 2023/2023"));      		
 	}
 
 	@Test
 	@Order(3)
-	@Description("Atualizar o nome do campeonato para Brasileirão")
-	void update() {
+	@DisplayName("Atualizar o nome do campeonato para [Brasileirão]")
+	void deveAtualizarCampeonatoComSucesso() {
 		String campeonatoModificado = "Brasileirão";
-		atualizarCampeonato(campeonatoId, campeonatoModificado, "Principal competição de pontos corridos do Brasil",
-				true);
-
-		// Confirmar que foi alterado
-		CampeonatoResponseDto campeonatoResponseDto = buscarCampeonato(campeonatoId);
-
-		assertEquals(campeonatoModificado, campeonatoResponseDto.getNome());
+		CampeonatoDto campeonatoDto = new CampeonatoDto(campeonatoModificado, "Principal competição de pontos corridos do Brasil", true);
+		
+        var response = new ApiRequestBuilder()
+                .url("/campeonato/v1/" + campeonatoId)
+                .method("PUT")
+                .body(campeonatoDto)
+                .execute();
+        
+        
+        response.then()
+    	.statusCode(200)
+    	.body("nome", equalTo(campeonatoModificado));
+        
+        
+        
+        response = new ApiRequestBuilder()
+                .url("/campeonato/v1/" + campeonatoId)
+                .execute();			
+		
+		
+        response.then()
+    	.statusCode(200)
+    	.body("nome", equalTo(campeonatoModificado));      		
 	}
 
 	@Test
 	@Order(4)
-	@Description("Atualizar campeonato inexistente")
-	void updateCampeonatoInexistente() {
-		String campeonatoModificado = "La liga";
+	@DisplayName("Atualizar [campeonato Inexistente id=10]")
+	void deveAtualizarCampeonatoInexistenteComError() {
+		CampeonatoDto campeonatoDto = new CampeonatoDto("La liga", "Campeonato espanhol", true);
+		
+        var response = new ApiRequestBuilder()
+                .url("/campeonato/v1/" + 10)
+                .method("PUT")
+                .body(campeonatoDto)
+                .execute();
 
-		int statusCode = atualizarCampeonatoInexistente(100L, campeonatoModificado, "Campeonato espanhol", true);
-
-		assertEquals(404, statusCode);
+        response.then()
+    	.statusCode(404);
 	}
 
 	@Test
 	@Order(5)
-	@Description("Listar todos os campeonatos - com paginação")
-	void findAll() {
-		String nome = "Série B";
-		String descricao = "Principal competição de pontos corridos do Brasil";
-		Boolean ativo = true;
-		criarCampeonato(nome, descricao, ativo);
-
-		List<CampeonatoResponseDto> campeonatoResponseDto = listarTodosOsCampeonatos();
-
+	@DisplayName("Listar todos os campeonatos - com paginação")
+	void deveListarCampeonato() {
+		CampeonatoDto campeonatoDto = new CampeonatoDto(
+				"Série B",
+				"Principal competição de pontos corridos do Brasil", 
+				true);
+		
+        var response = new ApiRequestBuilder()
+                .url("/campeonato/v1")
+                .method("POST")
+                .body(campeonatoDto)
+                .execute();	
+        
+        response.then()
+        	.statusCode(201);
+        
+        
+        List<CampeonatoResponseDto> campeonatoResponseDto = new ApiRequestBuilder()
+                .url("/campeonato/v1")
+                .executeAndExtractList("content", CampeonatoResponseDto.class, 200);
+        
 		assertEquals(2, campeonatoResponseDto.size());
 	}
 
 	@Test
 	@Order(6)
-	@Description("Listar todos os campeonatos cujo ID >= 2")
-	void findAllIdMaiorIgual() {
+	@DisplayName("Listar todos os campeonatos cujo ID >= 2")
+	void deveListarCampeonatoComIdMaiorIgual() {
 		Long ultimoCadastro = campeonatoId + 1;
-
-		List<CampeonatoResponseDto> campeonatoResponseDto = listarTodosOsCampeonatosIdMaiorOuIgual(ultimoCadastro);
-
+		
+        List<CampeonatoResponseDto> campeonatoResponseDto = new ApiRequestBuilder()
+                .url("/campeonato/v1/search-id-maior-igual/" + ultimoCadastro)
+                .executeAndExtractList("content", CampeonatoResponseDto.class, 200);
+		
 		assertEquals(1, campeonatoResponseDto.size());
 	}
 
 	@Test
 	@Order(7)
-	@Description("Listar o campeonato pelo nome")
-	void findAllNomeContem() {
+	@DisplayName("Listar o [campeonato pelo nome]")
+	void deveListarCampeonatoNomeContem() {
 		String campeonatoModificado = "Série B";
 
-		List<CampeonatoResponseDto> campeonatoResponseDto = listarTodosOsCampeonatosContemNome(campeonatoModificado);
-
+        List<CampeonatoResponseDto> campeonatoResponseDto = new ApiRequestBuilder()
+                .url("/campeonato/v1/search-nome/" + campeonatoModificado)
+                .executeAndExtractList("content", CampeonatoResponseDto.class, 200);
+		
 		assertEquals(1, campeonatoResponseDto.size());
 	}
 
 	@Test
 	@Order(8)
-	@Description("Listar todos os campeonatos ativos")
-	void carregarTodasOsCampçoenatos() {
-		List<CampeonatoResponseDto> campeonatoResponseDto = listarTodosOsCampeonatosAtivos();
-
+	@DisplayName("Listar todos os [campeonatos ativos]")
+	void deveListarCampeonatoAtivo() {
+        List<CampeonatoResponseDto> campeonatoResponseDto = new ApiRequestBuilder()
+                .url("/campeonato/v1/search-ativo")
+                .executeAndExtractList("content", CampeonatoResponseDto.class, 200);
+		
 		assertEquals(2, campeonatoResponseDto.size());
 	}
 
 	@Test
 	@Order(9)
-	@Description("Filtar todos os campeonatos por ID ou Nome")
-	void filterAllPorIdOrNome() {
-		List<CampeonatoResponseDto> campeonatoResponseDto = filtroPorIdMaiorOuIgual(1L);
-		assertEquals(2, campeonatoResponseDto.size());
-
-		campeonatoResponseDto = filtroPorNome("Série B");
-		assertEquals(1, campeonatoResponseDto.size());
+	@DisplayName("Filtar todos os campeonatos por ID ou Nome")
+	void deveListarCampeonatolPorIdOrNome() {
+        List<CampeonatoResponseDto> campeonatoResponseDtoFilter = new ApiRequestBuilder()
+                .url("/campeonato/v1/filter/" + 1)
+                .executeAndExtractList("content", CampeonatoResponseDto.class, 200);
+		assertEquals(2, campeonatoResponseDtoFilter.size());
+		
+		
+		
+		
+        List<CampeonatoResponseDto> campeonatoResponseDtoNome = new ApiRequestBuilder()
+                .url("/campeonato/v1/filter/" + "Série B")
+                .executeAndExtractList("content", CampeonatoResponseDto.class, 200);
+		assertEquals(1, campeonatoResponseDtoNome.size());
 	}
 
 	@Test
 	@Order(10)
-	@Description("Excluir o Campeonato id=1")
-	void delete() {
-		excluirCampeonato(campeonatoId);
-
-		// Confirmar se o registro foi excluido
-		int statusCode = campeonatoInexistente(campeonatoId);
-
-		assertEquals(404, statusCode);
+	@DisplayName("Excluir o Campeonato [id=1]")
+	void deveExcluirCampeonatoComSucesso() {
+        var response = new ApiRequestBuilder()
+                .url("/campeonato/v1/" + campeonatoId)
+                .method("DELETE")
+                .execute();	
+        
+        response.then()
+        	.statusCode(200);
 	}
 
 	@Test
 	@Order(11)
-	@Description("Excluir campeonato id=10 que não existe")
-	void deleteCampeonatoInexistente() {
-		int statusCode = campeonatoInexistente(10L);
-
-		assertEquals(404, statusCode);
+	@DisplayName("Excluir campeonato inexistente [id=1]")
+	void deveExcluirCampeonatoInexistenteComError() {
+        var response = new ApiRequestBuilder()
+                .url("/campeonato/v1/" + campeonatoId)
+                .method("DELETE")
+                .execute();	
+        
+        response.then()
+        	.statusCode(404);
 	}
-
-	private Long criarCampeonato(String nome, String descricao, Boolean ativo) {
-		CampeonatoDto campeonatoDto = new CampeonatoDto();
-		campeonatoDto.setNome(nome);
-		campeonatoDto.setDescricao(descricao);
-		campeonatoDto.setAtivo(ativo);
-
-		var campeonatoId = given()
-					.body(campeonatoDto)
-					.when()
-						.post("/campeonato/v1")
-					.then()
-						.statusCode(201).extract().jsonPath().getLong("id");
-
-		return campeonatoId;
-	}
-
-	private CampeonatoResponseDto buscarCampeonato(Long id) {
-		CampeonatoResponseDto campeonatoResponseDto = given()
-				.when()
-				.get("/campeonato/v1/" + id)
-					.then().statusCode(200).extract().as(CampeonatoResponseDto.class);
-
-		return campeonatoResponseDto;
-	}
-
-	private void atualizarCampeonato(Long id, String nome, String descricao, Boolean ativo) {
-		CampeonatoDto campeonatoDto = new CampeonatoDto();
-		campeonatoDto.setNome(nome);
-		campeonatoDto.setDescricao(descricao);
-		campeonatoDto.setAtivo(ativo);
-
-		given()
-			.body(campeonatoDto)
-			.when().put("/campeonato/v1/" + campeonatoId)
-				.then().statusCode(200);
-	}
-
-	private int atualizarCampeonatoInexistente(Long id, String nome, String descricao, Boolean ativo) {
-		CampeonatoDto campeonatoDto = new CampeonatoDto();
-		campeonatoDto.setNome(nome);
-		campeonatoDto.setDescricao(descricao);
-		campeonatoDto.setAtivo(ativo);
-
-		Response response = given()
-					.body(campeonatoDto)
-					.when().put("/campeonato/v1/" + id);
-
-		int statusCode = response.getStatusCode();
-
-		return statusCode;
-	}
-
-	private List<CampeonatoResponseDto> listarTodosOsCampeonatos() {
-		List<CampeonatoResponseDto> campeonatoResponseDto = given()
-				.when()
-				.get("/campeonato/v1")
-					.then().statusCode(200).extract().jsonPath()
-					.getList("content", CampeonatoResponseDto.class);
-
-		return campeonatoResponseDto;
-	}
-
-	private List<CampeonatoResponseDto> listarTodosOsCampeonatosAtivos() {
-		List<CampeonatoResponseDto> campeonatoResponseDto = given()
-				.get("/campeonato/v1/search-ativo")
-					.then().statusCode(200).extract().jsonPath()
-					.getList("content", CampeonatoResponseDto.class);
-
-		return campeonatoResponseDto;
-	}
-
-	private List<CampeonatoResponseDto> listarTodosOsCampeonatosIdMaiorOuIgual(Long id) {
-		List<CampeonatoResponseDto> campeonatoResponseDto = given()
-				.when()
-				.get("/campeonato/v1/search-id-maior-igual/" + id)
-					.then().statusCode(200).extract().jsonPath()
-					.getList("content", CampeonatoResponseDto.class);
-
-		return campeonatoResponseDto;
-	}
-
-	private List<CampeonatoResponseDto> listarTodosOsCampeonatosContemNome(String nome) {
-		List<CampeonatoResponseDto> campeonatoResponseDto = given()
-				.when()
-				.get("/campeonato/v1/search-nome/" + nome)
-					.then().statusCode(200).extract().jsonPath()
-					.getList("content", CampeonatoResponseDto.class);
-
-		return campeonatoResponseDto;
-
-	}
-
-	private List<CampeonatoResponseDto> filtroPorIdMaiorOuIgual(Long id) {
-		List<CampeonatoResponseDto> campeonatoResponseDto = given()
-				.when()
-				.get("/campeonato/v1/filter/" + id)
-					.then().statusCode(200).extract().jsonPath()
-					.getList("content", CampeonatoResponseDto.class);
-
-		return campeonatoResponseDto;
-	}
-
-	private List<CampeonatoResponseDto> filtroPorNome(String nome) {
-		List<CampeonatoResponseDto> campeonatoResponseDto = given()
-				.when()
-				.get("/campeonato/v1/filter/" + nome)
-					.then().statusCode(200).extract().jsonPath()
-					.getList("content", CampeonatoResponseDto.class);
-
-		return campeonatoResponseDto;
-	}
-
-	private void excluirCampeonato(Long id) {
-		given()
-				.when()
-				.delete("/campeonato/v1/" + id)
-					.then().statusCode(200);
-	}
-
-	private int campeonatoInexistente(Long id) {
-		Response response = given()
-				.when()
-				.get("/campeonato/v1/" + id);
-
-		int statusCode = response.getStatusCode();
-
-		return statusCode;
-	}
-
+	
 }
