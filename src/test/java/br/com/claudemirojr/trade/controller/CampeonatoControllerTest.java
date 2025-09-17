@@ -32,6 +32,7 @@ import io.restassured.http.ContentType;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CampeonatoControllerTest extends AplicacaoStartTestContainer {
+	//testando feature miro0-1
 
 	@Autowired
 	private CampeonatoRepository campeonatoRepository;
