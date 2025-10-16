@@ -1,0 +1,78 @@
+CREATE TABLE IF NOT EXISTS jogo (
+	id bigint NOT NULL AUTO_INCREMENT,
+	
+	campeonato_id bigint NOT NULL,
+	numero_rodada int NOT NULL,
+	eqp_mandante_id bigint NOT NULL,
+	eqp_mandante_primeito_tempo_total_gol int NOT NULL,
+	eqp_mandante_primeito_tempo_total_escanteio int NOT NULL,
+	eqp_mandante_segundo_tempo_total_gol int NOT NULL,
+	eqp_mandante_segundo_tempo_total_escanteio int NOT NULL,
+	eqp_mandante_total_gol int NOT NULL,
+	eqp_mandante_total_escanteio int NOT NULL,
+	eqp_visitante_id bigint NOT NULL,
+	eqp_visitante_primeito_tempo_total_gol int NOT NULL,
+	eqp_visitante_primeito_tempo_total_escanteio int NOT NULL,
+	eqp_visitante_segundo_tempo_total_gol int NOT NULL,
+	eqp_visitante_segundo_tempo_total_escanteio int NOT NULL,
+	eqp_visitante_total_gol int NOT NULL,
+	eqp_visitante_total_escanteio int NOT NULL,
+	mandante_result_primeito_tempo_gol int NOT NULL,
+	mandante_result_primeito_tempo_escanteio int NOT NULL,
+	mandante_result_segundo_tempo_gol int NOT NULL,
+	mandante_result_segundo_tempo_escanteio int NOT NULL,
+	mandante_result_gol int NOT NULL,
+	mandante_result_escanteio int NOT NULL,
+	
+	created_by varchar(255) DEFAULT NULL,
+	created_date datetime(6) DEFAULT NULL,
+	last_modified_by varchar(255) DEFAULT NULL,
+	last_modified_date datetime(6) DEFAULT NULL,
+	
+	PRIMARY KEY (id),
+	UNIQUE KEY UNK_jogo_ja_cadastrado (campeonato_id,numero_rodada,eqp_mandante_id,eqp_visitante_id),
+	KEY FK9s7aa5agoc27nfxuc3un3ke2t (eqp_mandante_id) /*!80000 INVISIBLE */,
+	KEY FKpjg2mihkilhowpc00cvwodgff (eqp_visitante_id) /*!80000 INVISIBLE */,
+	KEY FK6g9urf6y2yosejdkeie3u56k1 (campeonato_id),
+	CONSTRAINT FK6g9urf6y2yosejdkeie3u56k1 FOREIGN KEY (campeonato_id) REFERENCES campeonato (id),
+	CONSTRAINT FK9s7aa5agoc27nfxuc3un3ke2t FOREIGN KEY (eqp_mandante_id) REFERENCES equipe (id),
+	CONSTRAINT FKpjg2mihkilhowpc00cvwodgff FOREIGN KEY (eqp_visitante_id) REFERENCES equipe (id)
+) ENGINE=InnoDB;
+
+
+CREATE TABLE IF NOT EXISTS jogo_audit (
+	id bigint NOT NULL,
+	rev int NOT NULL,
+	revtype tinyint DEFAULT NULL,
+
+	created_by varchar(255) DEFAULT NULL,
+	created_date datetime(6) DEFAULT NULL,
+	last_modified_by varchar(255) DEFAULT NULL,
+	last_modified_date datetime(6) DEFAULT NULL,
+
+	eqp_mandante_primeito_tempo_total_escanteio int DEFAULT NULL,
+	eqp_mandante_primeito_tempo_total_gol int DEFAULT NULL,
+	eqp_mandante_segundo_tempo_total_escanteio int DEFAULT NULL,
+	eqp_mandante_segundo_tempo_total_gol int DEFAULT NULL,
+	eqp_mandante_total_escanteio int DEFAULT NULL,
+	eqp_mandante_total_gol int DEFAULT NULL,
+	eqp_visitante_primeito_tempo_total_escanteio int DEFAULT NULL,
+	eqp_visitante_primeito_tempo_total_gol int DEFAULT NULL,
+	eqp_visitante_segundo_tempo_total_escanteio int DEFAULT NULL,
+	eqp_visitante_segundo_tempo_total_gol int DEFAULT NULL,
+	eqp_visitante_total_escanteio int DEFAULT NULL,
+	eqp_visitante_total_gol int DEFAULT NULL,
+	mandante_result_escanteio int DEFAULT NULL,
+	mandante_result_gol int DEFAULT NULL,
+	mandante_result_primeito_tempo_escanteio int DEFAULT NULL,
+	mandante_result_primeito_tempo_gol int DEFAULT NULL,
+	mandante_result_segundo_tempo_escanteio int DEFAULT NULL,
+	mandante_result_segundo_tempo_gol int DEFAULT NULL,
+	numero_rodada int DEFAULT NULL,
+	campeonato_id bigint DEFAULT NULL,
+	eqp_mandante_id bigint DEFAULT NULL,
+	eqp_visitante_id bigint DEFAULT NULL,
+	PRIMARY KEY (rev,id),
+	CONSTRAINT FKcqwmuklve21yajnxkexayj5u7 FOREIGN KEY (rev) REFERENCES revinfo (rev)
+) ENGINE=InnoDB;
+

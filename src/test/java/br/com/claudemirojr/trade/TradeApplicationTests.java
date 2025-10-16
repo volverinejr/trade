@@ -8,7 +8,7 @@ public class TradeApplicationTests {
 	Vá na aba Environment.
 
 	Adicione as variáveis manualmente.
-		REDIS_HOST = localhost
+		REDIS_HOST=localhost
 		TEST_USERNAME
 		TEST_PASSWORD
 */
