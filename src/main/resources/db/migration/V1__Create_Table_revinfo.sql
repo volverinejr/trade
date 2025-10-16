@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS revinfo (
+  rev int NOT NULL AUTO_INCREMENT,
+  revtstmp bigint DEFAULT NULL,
+  PRIMARY KEY (rev)
+) ENGINE=InnoDB;
