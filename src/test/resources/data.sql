@@ -1,3 +1,2 @@
-create table miro (
-	id_chave varchar(10)
-);
+insert into miro ( id_chave ) 
+values ( 'TESTE de SCRIPT' );
