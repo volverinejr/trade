@@ -17,4 +17,19 @@ COPY --from=builder --chown=appuser:appuser /app/app.jar app.jar
 
 USER appuser
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Flags JVM recomendadas para melhor performance no AKS
+ENV JAVA_OPTS="\
+  -XX:+UseG1GC \
+  -XX:+ParallelRefProcEnabled \
+  -XX:+AlwaysPreTouch \
+  -XX:MaxRAMPercentage=75.0 \
+  -XX:+UseStringDeduplication \
+  -XX:+TieredCompilation -XX:+TieredStopAtLevel=1 \
+  -XX:+ExitOnOutOfMemoryError \
+"
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+
+
+#ENTRYPOINT ["java", "-jar", "app.jar"]
