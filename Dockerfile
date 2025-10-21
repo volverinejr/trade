@@ -25,7 +25,7 @@ ENV JAVA_OPTS="\
   -XX:+AlwaysPreTouch \
   -XX:MaxRAMPercentage=75.0 \
   -XX:+UseStringDeduplication \
-  -XX:+TieredCompilation -XX:+TieredStopAtLevel=1 \
+  -XX:+TieredCompilation -XX:TieredStopAtLevel=1 \
   -XX:+ExitOnOutOfMemoryError \
 "
 
