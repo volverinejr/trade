@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+#      day: 1  # só roda no dia 1 de cada mês
+    open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "org.springframework.boot:spring-boot-starter-parent"
+        versions: ["[4.0,)"]
