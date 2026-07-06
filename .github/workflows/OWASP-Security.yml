@@ -3,7 +3,7 @@ name: Análise de Segurança com OWASP
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 3 * * 1'  # toda segunda-feira às 03:00 UTC
+    - cron: '0 3 1 * *'  # todo dia 1 às 03:00 UTC
   pull_request:
     branches: [main]
 
